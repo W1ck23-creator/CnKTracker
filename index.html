@@ -30,6 +30,22 @@
     h1 { margin: 0 0 6px; font-size: 1.9rem; }
     h2 { margin: 0 0 12px; }
     .sub { margin: 0 0 18px; color: var(--muted); }
+    .topbar {
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .nav {
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .nav a {
+      text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border);
+      padding:10px 14px; border-radius:999px; font-weight:700;
+    }
+    .nav a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .version {
+      color: var(--muted); font-size: 0.9rem; font-weight: 700;
+      background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px;
+    }
     .grid { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
     .card {
       grid-column: span 12; background: var(--card); border: 1px solid rgba(0,0,0,0.06);
@@ -66,34 +82,17 @@
     }
     .footer-note { margin-top: 14px; color: var(--muted); font-size: 0.92rem; }
     .check-grid {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      margin-top: 8px;
+      display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 8px;
     }
     .check-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 12px 14px;
-      min-height: 52px;
+      display: flex; align-items: center; gap: 10px; background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 14px; padding: 12px 14px; min-height: 52px;
     }
     .check-item input[type="checkbox"] {
-      width: 20px;
-      min-height: 20px;
-      margin: 0;
-      accent-color: var(--accent);
+      width: 20px; min-height: 20px; margin: 0; accent-color: var(--accent);
     }
-    .inline-note {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-top: 6px;
-    }
+    .inline-note { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
     .hidden { display: none !important; }
-
     @media (max-width: 900px) {
       .totals { grid-template-columns: repeat(2, 1fr); }
       .check-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -107,6 +106,14 @@
 </head>
 <body>
   <div class="wrap">
+    <div class="topbar">
+      <div class="nav">
+        <a class="active" href="./index.html">Tracker</a>
+        <a href="./reports.html">Reports</a>
+      </div>
+      <div class="version">Version 3.0</div>
+    </div>
+
     <h1>Macro Tracker</h1>
     <p class="sub">Simple local tracking for the things you actually care about. Data is stored on this device/browser only.</p>
 
@@ -177,33 +184,33 @@
 
       <section class="card">
         <div class="pill">Daily Totals So Far</div>
-        <div class="totals" id="totalsGrid" style="margin-top:14px;">
-          <div class="tile metric-tile metric-calories">
+        <div class="totals" style="margin-top:14px;">
+          <div class="tile metric-calories">
             <div class="label">Calories</div>
             <div class="value" id="totalCalories">0</div>
             <div class="goal" id="goalCalories">Goal: 0</div>
           </div>
-          <div class="tile metric-tile metric-protein">
+          <div class="tile metric-protein">
             <div class="label">Protein</div>
             <div class="value" id="totalProtein">0g</div>
             <div class="goal" id="goalProtein">Goal: 0g</div>
           </div>
-          <div class="tile metric-tile metric-carbs">
+          <div class="tile metric-carbs">
             <div class="label">Carbs</div>
             <div class="value" id="totalCarbs">0g</div>
             <div class="goal" id="goalCarbs">Goal: 0g</div>
           </div>
-          <div class="tile metric-tile metric-fat">
+          <div class="tile metric-fat">
             <div class="label">Fat</div>
             <div class="value" id="totalFat">0g</div>
             <div class="goal" id="goalFat">Goal: 0g</div>
           </div>
-          <div class="tile metric-tile metric-sugar">
+          <div class="tile metric-sugar">
             <div class="label">Sugar</div>
             <div class="value" id="totalSugar">0g</div>
             <div class="goal" id="goalSugar">Goal: 0g</div>
           </div>
-          <div class="tile metric-tile metric-fiber">
+          <div class="tile metric-fiber">
             <div class="label">Fiber</div>
             <div class="value" id="totalFiber">0g</div>
             <div class="goal" id="goalFiber">Goal: 0g</div>
@@ -261,7 +268,7 @@
 
       <section class="card">
         <h2>Tracking Options</h2>
-        <div class="inline-note">Choose which metrics this person wants to track. Hidden metrics will disappear from the entry form, daily totals, goals, and entries table.</div>
+        <div class="inline-note">Choose which metrics this person wants to track. Hidden metrics disappear from the form, totals, goals, and entries table.</div>
         <div class="check-grid">
           <label class="check-item"><input type="checkbox" id="trackCalories" /> <span>Calories</span></label>
           <label class="check-item"><input type="checkbox" id="trackProtein" /> <span>Protein</span></label>
@@ -277,7 +284,7 @@
 
       <section class="card">
         <h2>App Tools</h2>
-        <div class="inline-note">Refresh is handy when using this from an iPhone Home Screen web app, where the normal browser refresh controls are hidden.</div>
+        <div class="inline-note">Use Refresh when the Home Screen web app seems stuck on an older view.</div>
         <div class="actions" style="margin-top:12px;">
           <button class="secondary" id="refreshBtn">Refresh Page</button>
         </div>
@@ -286,22 +293,17 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'macroTrackerV2_1';
-    const PREVIOUS_KEYS = ['macroTrackerV2', 'macroTrackerV1'];
+    const APP_VERSION = '3.0';
+    const STORAGE_KEY = 'macroTrackerV3';
+    const PREVIOUS_KEYS = ['macroTrackerV2_1', 'macroTrackerV2', 'macroTrackerV1'];
     const METRICS = ['calories', 'protein', 'carbs', 'fat', 'sugar', 'fiber'];
     const DEFAULT_TRACKING = {
-      calories: true,
-      protein: true,
-      carbs: true,
-      fat: true,
-      sugar: true,
-      fiber: true
+      calories: true, protein: true, carbs: true, fat: true, sugar: true, fiber: true
     };
 
     const el = {
       person: document.getElementById('person'),
       date: document.getElementById('date'),
-
       goalCalInput: document.getElementById('goalCalInput'),
       goalProteinInput: document.getElementById('goalProteinInput'),
       goalCarbsInput: document.getElementById('goalCarbsInput'),
@@ -309,7 +311,6 @@
       goalSugarInput: document.getElementById('goalSugarInput'),
       goalFiberInput: document.getElementById('goalFiberInput'),
       saveGoalsBtn: document.getElementById('saveGoalsBtn'),
-
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
       calories: document.getElementById('calories'),
@@ -319,21 +320,18 @@
       sugar: document.getElementById('sugar'),
       fiber: document.getElementById('fiber'),
       addEntryBtn: document.getElementById('addEntryBtn'),
-
       totalCalories: document.getElementById('totalCalories'),
       totalProtein: document.getElementById('totalProtein'),
       totalCarbs: document.getElementById('totalCarbs'),
       totalFat: document.getElementById('totalFat'),
       totalSugar: document.getElementById('totalSugar'),
       totalFiber: document.getElementById('totalFiber'),
-
       goalCalories: document.getElementById('goalCalories'),
       goalProtein: document.getElementById('goalProtein'),
       goalCarbs: document.getElementById('goalCarbs'),
       goalFat: document.getElementById('goalFat'),
       goalSugar: document.getElementById('goalSugar'),
       goalFiber: document.getElementById('goalFiber'),
-
       trackCalories: document.getElementById('trackCalories'),
       trackProtein: document.getElementById('trackProtein'),
       trackCarbs: document.getElementById('trackCarbs'),
@@ -341,7 +339,6 @@
       trackSugar: document.getElementById('trackSugar'),
       trackFiber: document.getElementById('trackFiber'),
       saveTrackingBtn: document.getElementById('saveTrackingBtn'),
-
       entriesWrap: document.getElementById('entriesWrap'),
       clearDayBtn: document.getElementById('clearDayBtn'),
       exportBtn: document.getElementById('exportBtn'),
@@ -355,41 +352,26 @@
       const tzOffset = d.getTimezoneOffset() * 60000;
       return new Date(d - tzOffset).toISOString().slice(0, 10);
     }
-
-    function defaultGoals() {
-      return { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, fiber: 0 };
-    }
-
-    function defaultTracking() {
-      return { ...DEFAULT_TRACKING };
-    }
-
+    function defaultGoals() { return { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, fiber: 0 }; }
+    function defaultTracking() { return { ...DEFAULT_TRACKING }; }
     function defaultState() {
       return {
-        goals: {
-          Chad: defaultGoals(),
-          Andrea: defaultGoals()
-        },
-        tracking: {
-          Chad: defaultTracking(),
-          Andrea: defaultTracking()
-        },
+        version: APP_VERSION,
+        goals: { Chad: defaultGoals(), Andrea: defaultGoals() },
+        tracking: { Chad: defaultTracking(), Andrea: defaultTracking() },
         entries: { Chad: {}, Andrea: {} }
       };
     }
-
     function tryLoadKey(key) {
       try {
         const raw = localStorage.getItem(key);
         if (!raw) return null;
         return JSON.parse(raw);
-      } catch {
-        return null;
-      }
+      } catch { return null; }
     }
-
     function normalizeState(parsed) {
       return {
+        version: APP_VERSION,
         goals: {
           Chad: { ...defaultGoals(), ...(parsed.goals?.Chad || {}) },
           Andrea: { ...defaultGoals(), ...(parsed.goals?.Andrea || {}) }
@@ -404,83 +386,38 @@
         }
       };
     }
-
     function loadState() {
       const current = tryLoadKey(STORAGE_KEY);
       if (current) return normalizeState(current);
-
       for (const key of PREVIOUS_KEYS) {
         const older = tryLoadKey(key);
         if (older) return normalizeState(older);
       }
-
       return defaultState();
     }
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function getCurrentPerson() {
-      return el.person.value;
-    }
-
-    function getCurrentDate() {
-      return el.date.value || todayString();
-    }
-
-    function getCurrentTracking() {
-      return state.tracking[getCurrentPerson()] || defaultTracking();
-    }
-
-    function getEntriesForCurrentDay() {
-      return state.entries[getCurrentPerson()][getCurrentDate()] || [];
-    }
-
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function getCurrentPerson() { return el.person.value; }
+    function getCurrentDate() { return el.date.value || todayString(); }
+    function getCurrentTracking() { return state.tracking[getCurrentPerson()] || defaultTracking(); }
+    function getEntriesForCurrentDay() { return state.entries[getCurrentPerson()][getCurrentDate()] || []; }
     function setEntriesForCurrentDay(entries) {
       state.entries[getCurrentPerson()][getCurrentDate()] = entries;
       saveState();
     }
-
-    function formatNum(n) {
-      return Number(n || 0).toLocaleString();
-    }
-
-    function metricSuffix(metric) {
-      return metric === 'calories' ? '' : 'g';
-    }
-
+    function formatNum(n) { return Number(n || 0).toLocaleString(); }
+    function metricSuffix(metric) { return metric === 'calories' ? '' : 'g'; }
     function metricLabel(metric) {
-      const labels = {
-        calories: 'Calories',
-        protein: 'Protein',
-        carbs: 'Carbs',
-        fat: 'Fat',
-        sugar: 'Sugar',
-        fiber: 'Fiber'
-      };
-      return labels[metric] || metric;
+      return { calories:'Calories', protein:'Protein', carbs:'Carbs', fat:'Fat', sugar:'Sugar', fiber:'Fiber' }[metric] || metric;
     }
-
     function escapeHtml(str) {
-      return String(str || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(str || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
     }
-
     function applyTrackingVisibility() {
       const tracking = getCurrentTracking();
-
       METRICS.forEach(metric => {
         const visible = !!tracking[metric];
-        document.querySelectorAll('.metric-' + metric).forEach(node => {
-          node.classList.toggle('hidden', !visible);
-        });
+        document.querySelectorAll('.metric-' + metric).forEach(node => node.classList.toggle('hidden', !visible));
       });
-
       el.trackCalories.checked = !!tracking.calories;
       el.trackProtein.checked = !!tracking.protein;
       el.trackCarbs.checked = !!tracking.carbs;
@@ -488,17 +425,14 @@
       el.trackSugar.checked = !!tracking.sugar;
       el.trackFiber.checked = !!tracking.fiber;
     }
-
     function refreshGoalsUI() {
       const goals = state.goals[getCurrentPerson()];
-
       el.goalCalInput.value = goals.calories || '';
       el.goalProteinInput.value = goals.protein || '';
       el.goalCarbsInput.value = goals.carbs || '';
       el.goalFatInput.value = goals.fat || '';
       el.goalSugarInput.value = goals.sugar || '';
       el.goalFiberInput.value = goals.fiber || '';
-
       el.goalCalories.textContent = `Goal: ${formatNum(goals.calories)}`;
       el.goalProtein.textContent = `Goal: ${formatNum(goals.protein)}g`;
       el.goalCarbs.textContent = `Goal: ${formatNum(goals.carbs)}g`;
@@ -506,51 +440,27 @@
       el.goalSugar.textContent = `Goal: ${formatNum(goals.sugar)}g`;
       el.goalFiber.textContent = `Goal: ${formatNum(goals.fiber)}g`;
     }
-
     function buildEntriesTable(entries) {
       const tracking = getCurrentTracking();
       const trackedMetrics = METRICS.filter(metric => tracking[metric]);
-
-      const headerCells = ['Meal', 'Food']
-        .concat(trackedMetrics.map(metric => metricLabel(metric)))
-        .concat(['']);
-
+      const headerCells = ['Meal', 'Food'].concat(trackedMetrics.map(metric => metricLabel(metric))).concat(['']);
       const rows = entries.map((item, index) => {
-        const valueCells = trackedMetrics.map(metric => {
-          const suffix = metricSuffix(metric);
-          return `<td>${formatNum(item[metric] || 0)}${suffix}</td>`;
-        }).join('');
-
-        return `
-          <tr>
-            <td>${escapeHtml(item.meal)}</td>
-            <td>${escapeHtml(item.foodName)}</td>
-            ${valueCells}
-            <td><button class="danger" data-delete-index="${index}" style="min-height:36px;padding:8px 10px;">Delete</button></td>
-          </tr>
-        `;
+        const valueCells = trackedMetrics.map(metric => `<td>${formatNum(item[metric] || 0)}${metricSuffix(metric)}</td>`).join('');
+        return `<tr>
+          <td>${escapeHtml(item.meal)}</td>
+          <td>${escapeHtml(item.foodName)}</td>
+          ${valueCells}
+          <td><button class="danger" data-delete-index="${index}" style="min-height:36px;padding:8px 10px;">Delete</button></td>
+        </tr>`;
       }).join('');
-
-      return `
-        <table>
-          <thead>
-            <tr>${headerCells.map(h => `<th>${h}</th>`).join('')}</tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+      return `<table><thead><tr>${headerCells.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
     }
-
     function refreshTotalsAndEntries() {
       const entries = getEntriesForCurrentDay();
-
       const totals = entries.reduce((acc, item) => {
-        METRICS.forEach(metric => {
-          acc[metric] += Number(item[metric] || 0);
-        });
+        METRICS.forEach(metric => { acc[metric] += Number(item[metric] || 0); });
         return acc;
-      }, { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, fiber: 0 });
-
+      }, { calories:0, protein:0, carbs:0, fat:0, sugar:0, fiber:0 });
       el.totalCalories.textContent = formatNum(totals.calories);
       el.totalProtein.textContent = `${formatNum(totals.protein)}g`;
       el.totalCarbs.textContent = `${formatNum(totals.carbs)}g`;
@@ -562,9 +472,7 @@
         el.entriesWrap.innerHTML = '<div class="empty">No entries yet for this day.</div>';
         return;
       }
-
       el.entriesWrap.innerHTML = buildEntriesTable(entries);
-
       el.entriesWrap.querySelectorAll('[data-delete-index]').forEach(btn => {
         btn.addEventListener('click', () => {
           const idx = Number(btn.getAttribute('data-delete-index'));
@@ -575,13 +483,11 @@
         });
       });
     }
-
     function refreshAll() {
       applyTrackingVisibility();
       refreshGoalsUI();
       refreshTotalsAndEntries();
     }
-
     function addEntry() {
       const foodName = el.foodName.value.trim();
       if (!foodName) {
@@ -589,7 +495,6 @@
         el.foodName.focus();
         return;
       }
-
       const entry = {
         meal: el.meal.value,
         foodName,
@@ -600,11 +505,9 @@
         sugar: Number(el.sugar.value || 0),
         fiber: Number(el.fiber.value || 0)
       };
-
       const current = getEntriesForCurrentDay();
       current.push(entry);
       setEntriesForCurrentDay(current);
-
       el.foodName.value = '';
       el.calories.value = '';
       el.protein.value = '';
@@ -613,10 +516,8 @@
       el.sugar.value = '';
       el.fiber.value = '';
       el.foodName.focus();
-
       refreshTotalsAndEntries();
     }
-
     function saveGoals() {
       state.goals[getCurrentPerson()] = {
         calories: Number(el.goalCalInput.value || 0),
@@ -630,47 +531,34 @@
       refreshGoalsUI();
       alert(`Goals saved for ${getCurrentPerson()}.`);
     }
-
     function saveTrackingOptions() {
       const updated = {
-        calories: el.trackCalories.checked,
-        protein: el.trackProtein.checked,
-        carbs: el.trackCarbs.checked,
-        fat: el.trackFat.checked,
-        sugar: el.trackSugar.checked,
-        fiber: el.trackFiber.checked
+        calories: el.trackCalories.checked, protein: el.trackProtein.checked, carbs: el.trackCarbs.checked,
+        fat: el.trackFat.checked, sugar: el.trackSugar.checked, fiber: el.trackFiber.checked
       };
-
       if (!Object.values(updated).some(Boolean)) {
         alert('Please leave at least one tracking option turned on.');
         return;
       }
-
       state.tracking[getCurrentPerson()] = updated;
       saveState();
       refreshAll();
       alert(`Tracking options saved for ${getCurrentPerson()}.`);
     }
-
     function clearDay() {
       if (!confirm(`Delete all entries for ${getCurrentPerson()} on ${getCurrentDate()}?`)) return;
       state.entries[getCurrentPerson()][getCurrentDate()] = [];
       saveState();
       refreshTotalsAndEntries();
     }
-
     function exportBackup() {
       const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `macro-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
-
     function importBackup(file) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -680,17 +568,14 @@
           saveState();
           refreshAll();
           alert('Backup imported successfully.');
-        } catch {
-          alert('That file could not be imported.');
-        }
+        } catch { alert('That file could not be imported.'); }
       };
       reader.readAsText(file);
     }
 
     let state = loadState();
-
+    saveState();
     el.date.value = todayString();
-
     el.person.addEventListener('change', refreshAll);
     el.date.addEventListener('change', refreshAll);
     el.addEntryBtn.addEventListener('click', addEntry);
@@ -705,13 +590,9 @@
       e.target.value = '';
     });
     el.refreshBtn.addEventListener('click', () => window.location.reload());
-
     [el.foodName, el.calories, el.protein, el.carbs, el.fat, el.sugar, el.fiber].forEach(input => {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') addEntry();
-      });
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addEntry(); });
     });
-
     refreshAll();
   </script>
 </body>

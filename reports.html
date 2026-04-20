@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Macro Tracker Reports</title>
+  <meta name="theme-color" content="#1f2937" />
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 18px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; }
+    .nav a {
+      text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border);
+      padding:10px 14px; border-radius:999px; font-weight:700;
+    }
+    .nav a.active { background: var(--accent); color:#fff; border-color:var(--accent); }
+    .version {
+      color: var(--muted); font-size: 0.9rem; font-weight:700;
+      background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.9rem; }
+    h2 { margin: 0 0 12px; }
+    .sub { margin: 0 0 18px; color: var(--muted); }
+    .grid { display:grid; gap:16px; grid-template-columns:repeat(12,1fr); }
+    .card {
+      grid-column: span 12; background: var(--card); border:1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding:16px;
+    }
+    .row { display:grid; gap:12px; grid-template-columns:repeat(12,1fr); align-items:end; }
+    .field { grid-column: span 12; }
+    .field.half { grid-column: span 6; }
+    label { display:block; margin-bottom:6px; font-size:0.92rem; color:var(--muted); font-weight:600; }
+    select, button {
+      width:100%; min-height:44px; border-radius:12px; border:1px solid var(--border);
+      padding:10px 12px; font-size:1rem; background:#fff;
+    }
+    button { background: var(--accent); color:#fff; border:none; font-weight:700; cursor:pointer; }
+    button:hover { background: var(--accent-2); }
+    button.secondary { background:#e5e7eb; color:#111827; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .tile { background:#f9fafb; border:1px solid #e5e7eb; border-radius:14px; padding:14px; }
+    .tile .label { color:var(--muted); font-size:0.9rem; margin-bottom:6px; font-weight:700; }
+    .tile .value { font-size:1.35rem; font-weight:800; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th, td { text-align:left; padding:10px 8px; border-bottom:1px solid #e5e7eb; vertical-align:top; }
+    th { color:var(--muted); font-size:0.9rem; }
+    .empty { color:var(--muted); padding:12px 0 4px; }
+    .inline-note { color:var(--muted); font-size:0.92rem; margin-top:6px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    @media (max-width: 900px) { .stats { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width: 760px) { .stats { grid-template-columns:1fr; } .field.half { grid-column: span 12; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="nav">
+        <a href="./index.html">Tracker</a>
+        <a class="active" href="./reports.html">Reports</a>
+      </div>
+      <div class="version">Version 3.0</div>
+    </div>
+
+    <h1>Reports</h1>
+    <p class="sub">Weekly and monthly summaries based on the data saved in this browser/device.</p>
+
+    <div class="grid">
+      <section class="card">
+        <div class="row">
+          <div class="field half">
+            <label for="person">Profile</label>
+            <select id="person">
+              <option value="Chad">Chad</option>
+              <option value="Andrea">Andrea</option>
+            </select>
+          </div>
+          <div class="field half">
+            <label for="period">Report Type</label>
+            <select id="period">
+              <option value="weekly">Last 7 Days</option>
+              <option value="monthly">Last 30 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:12px;">
+          <button id="refreshReportBtn">Refresh Report</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Summary</h2>
+        <div class="stats">
+          <div class="tile">
+            <div class="label">Days With Entries</div>
+            <div class="value" id="daysWithEntries">0</div>
+          </div>
+          <div class="tile">
+            <div class="label">Total Entries</div>
+            <div class="value" id="totalEntries">0</div>
+          </div>
+          <div class="tile">
+            <div class="label">Average Entries / Active Day</div>
+            <div class="value" id="avgEntriesPerDay">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Averages Per Active Day</h2>
+        <div class="inline-note">Only metrics turned on for this person are shown here.</div>
+        <div class="stats" id="averagesGrid" style="margin-top:12px;"></div>
+      </section>
+
+      <section class="card">
+        <h2>Day-by-Day Breakdown</h2>
+        <div class="table-wrap" id="dayTableWrap"></div>
+      </section>
+
+      <section class="card">
+        <h2>App Tools</h2>
+        <div class="inline-note">Use Refresh when the Home Screen web app seems stuck on an older view.</div>
+        <div class="actions" style="margin-top:12px;">
+          <button class="secondary" id="reloadPageBtn">Refresh Page</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const APP_VERSION = '3.0';
+    const STORAGE_KEY = 'macroTrackerV3';
+    const PREVIOUS_KEYS = ['macroTrackerV2_1', 'macroTrackerV2', 'macroTrackerV1'];
+    const METRICS = ['calories', 'protein', 'carbs', 'fat', 'sugar', 'fiber'];
+    const DEFAULT_TRACKING = { calories:true, protein:true, carbs:true, fat:true, sugar:true, fiber:true };
+
+    const el = {
+      person: document.getElementById('person'),
+      period: document.getElementById('period'),
+      refreshReportBtn: document.getElementById('refreshReportBtn'),
+      reloadPageBtn: document.getElementById('reloadPageBtn'),
+      daysWithEntries: document.getElementById('daysWithEntries'),
+      totalEntries: document.getElementById('totalEntries'),
+      avgEntriesPerDay: document.getElementById('avgEntriesPerDay'),
+      averagesGrid: document.getElementById('averagesGrid'),
+      dayTableWrap: document.getElementById('dayTableWrap')
+    };
+
+    function defaultGoals() { return { calories:0, protein:0, carbs:0, fat:0, sugar:0, fiber:0 }; }
+    function defaultTracking() { return { ...DEFAULT_TRACKING }; }
+    function tryLoadKey(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch { return null; }
+    }
+    function normalizeState(parsed) {
+      return {
+        version: APP_VERSION,
+        goals: {
+          Chad: { ...defaultGoals(), ...(parsed.goals?.Chad || {}) },
+          Andrea: { ...defaultGoals(), ...(parsed.goals?.Andrea || {}) }
+        },
+        tracking: {
+          Chad: { ...defaultTracking(), ...(parsed.tracking?.Chad || {}) },
+          Andrea: { ...defaultTracking(), ...(parsed.tracking?.Andrea || {}) }
+        },
+        entries: {
+          Chad: parsed.entries?.Chad || {},
+          Andrea: parsed.entries?.Andrea || {}
+        }
+      };
+    }
+    function loadState() {
+      const current = tryLoadKey(STORAGE_KEY);
+      if (current) return normalizeState(current);
+      for (const key of PREVIOUS_KEYS) {
+        const older = tryLoadKey(key);
+        if (older) return normalizeState(older);
+      }
+      return normalizeState({});
+    }
+    function formatNum(n) { return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 1 }); }
+    function metricSuffix(metric) { return metric === 'calories' ? '' : 'g'; }
+    function metricLabel(metric) {
+      return { calories:'Calories', protein:'Protein', carbs:'Carbs', fat:'Fat', sugar:'Sugar', fiber:'Fiber' }[metric] || metric;
+    }
+    function currentPerson() { return el.person.value; }
+    function currentTracking() { return state.tracking[currentPerson()] || defaultTracking(); }
+
+    function buildDateRange(daysBack) {
+      const out = [];
+      const today = new Date();
+      for (let i = daysBack - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        out.push(new Date(d - tzOffset).toISOString().slice(0, 10));
+      }
+      return out;
+    }
+
+    function getTotalsForDate(person, dateStr) {
+      const entries = state.entries?.[person]?.[dateStr] || [];
+      const totals = { calories:0, protein:0, carbs:0, fat:0, sugar:0, fiber:0, entryCount: entries.length };
+      entries.forEach(item => {
+        METRICS.forEach(metric => totals[metric] += Number(item[metric] || 0));
+      });
+      return totals;
+    }
+
+    function renderAverages(days) {
+      const tracking = currentTracking();
+      const person = currentPerson();
+      const dayTotals = days.map(d => ({ date:d, totals:getTotalsForDate(person, d) }));
+      const activeDays = dayTotals.filter(d => d.totals.entryCount > 0);
+      const activeCount = activeDays.length;
+
+      el.daysWithEntries.textContent = formatNum(activeCount);
+      const totalEntries = dayTotals.reduce((sum, d) => sum + d.totals.entryCount, 0);
+      el.totalEntries.textContent = formatNum(totalEntries);
+      el.avgEntriesPerDay.textContent = activeCount ? formatNum(totalEntries / activeCount) : '0';
+
+      const tracked = METRICS.filter(metric => tracking[metric]);
+      if (!tracked.length) {
+        el.averagesGrid.innerHTML = '<div class="empty">No tracked metrics selected for this person.</div>';
+        return;
+      }
+
+      if (!activeCount) {
+        el.averagesGrid.innerHTML = '<div class="empty">No entries yet in this time range.</div>';
+        return;
+      }
+
+      const html = tracked.map(metric => {
+        const sum = activeDays.reduce((acc, d) => acc + d.totals[metric], 0);
+        const avg = sum / activeCount;
+        return `<div class="tile">
+          <div class="label">${metricLabel(metric)}</div>
+          <div class="value">${formatNum(avg)}${metricSuffix(metric)}</div>
+        </div>`;
+      }).join('');
+
+      el.averagesGrid.innerHTML = html;
+    }
+
+    function renderDayTable(days) {
+      const tracking = currentTracking();
+      const tracked = METRICS.filter(metric => tracking[metric]);
+      const person = currentPerson();
+
+      if (!tracked.length) {
+        el.dayTableWrap.innerHTML = '<div class="empty">No tracked metrics selected for this person.</div>';
+        return;
+      }
+
+      const header = ['Date', 'Entries'].concat(tracked.map(metricLabel));
+      const rows = days.map(dateStr => {
+        const totals = getTotalsForDate(person, dateStr);
+        const cells = [
+          `<td>${dateStr}</td>`,
+          `<td>${formatNum(totals.entryCount)}</td>`
+        ].concat(tracked.map(metric => `<td>${formatNum(totals[metric])}${metricSuffix(metric)}</td>`));
+        return `<tr>${cells.join('')}</tr>`;
+      }).join('');
+
+      el.dayTableWrap.innerHTML = `<table>
+        <thead><tr>${header.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    function refreshReport() {
+      state = loadState();
+      const days = buildDateRange(el.period.value === 'weekly' ? 7 : 30);
+      renderAverages(days);
+      renderDayTable(days);
+    }
+
+    let state = loadState();
+
+    el.person.addEventListener('change', refreshReport);
+    el.period.addEventListener('change', refreshReport);
+    el.refreshReportBtn.addEventListener('click', refreshReport);
+    el.reloadPageBtn.addEventListener('click', () => window.location.reload());
+
+    refreshReport();
+  </script>
+</body>
+</html>
