@@ -3,314 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Macro Tracker</title>
+  <title>CnKTracker</title>
   <meta name="theme-color" content="#1f2937" />
   <style>
-    :root {
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #d1d5db;
-      --accent: #2563eb;
-      --accent-2: #1d4ed8;
-      --danger: #b91c1c;
-      --good: #065f46;
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 18px; }
-    h1 { margin: 0 0 6px; font-size: 1.9rem; }
-    h2 { margin: 0 0 12px; }
-    .sub { margin: 0 0 18px; color: var(--muted); }
-    .topbar {
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      margin-bottom: 14px; flex-wrap: wrap;
-    }
-    .nav {
-      display:flex; gap:10px; flex-wrap:wrap;
-    }
-    .nav a {
-      text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border);
-      padding:10px 14px; border-radius:999px; font-weight:700;
-    }
-    .nav a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .version {
-      color: var(--muted); font-size: 0.9rem; font-weight: 700;
-      background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px;
-    }
-    .grid { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
-    .card {
-      grid-column: span 12; background: var(--card); border: 1px solid rgba(0,0,0,0.06);
-      border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px;
-    }
-    .row { display: grid; gap: 12px; grid-template-columns: repeat(12, 1fr); align-items: end; }
-    .field { grid-column: span 12; }
-    .field.half { grid-column: span 6; }
-    .field.third { grid-column: span 4; }
-    .field.quarter { grid-column: span 3; }
-    label { display: block; margin-bottom: 6px; font-size: 0.92rem; color: var(--muted); font-weight: 600; }
-    input, select, button {
-      width: 100%; min-height: 44px; border-radius: 12px; border: 1px solid var(--border);
-      padding: 10px 12px; font-size: 1rem; background: #fff;
-    }
-    button { background: var(--accent); color: white; border: none; font-weight: 700; cursor: pointer; }
-    button:hover { background: var(--accent-2); }
-    button.secondary { background: #e5e7eb; color: #111827; }
-    button.secondary:hover { background: #d1d5db; }
-    button.danger { background: var(--danger); }
-    .totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .tile { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; }
-    .tile .label { color: var(--muted); font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
-    .tile .value { font-size: 1.35rem; font-weight: 800; }
-    .tile .goal { margin-top: 4px; color: var(--good); font-size: 0.9rem; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-    th { color: var(--muted); font-size: 0.9rem; }
-    .empty { color: var(--muted); padding: 12px 0 4px; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pill {
-      display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
-      padding: 4px 8px; border-radius: 999px; font-size: 0.85rem; font-weight: 700;
-    }
-    .footer-note { margin-top: 14px; color: var(--muted); font-size: 0.92rem; }
-    .check-grid {
-      display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 8px;
-    }
-    .check-item {
-      display: flex; align-items: center; gap: 10px; background: #f9fafb; border: 1px solid #e5e7eb;
-      border-radius: 14px; padding: 12px 14px; min-height: 52px;
-    }
-    .check-item input[type="checkbox"] {
-      width: 20px; min-height: 20px; margin: 0; accent-color: var(--accent);
-    }
-    .inline-note { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
-    .hidden { display: none !important; }
-    @media (max-width: 900px) {
-      .totals { grid-template-columns: repeat(2, 1fr); }
-      .check-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 760px) {
-      .totals { grid-template-columns: repeat(2, 1fr); }
-      .check-grid { grid-template-columns: 1fr; }
-      .field.half, .field.third, .field.quarter { grid-column: span 12; }
-    }
+    :root { --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#2563eb; --accent2:#1d4ed8; --danger:#b91c1c; --good:#065f46; --shadow:0 8px 24px rgba(0,0,0,0.08); --radius:18px; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width:1120px; margin:0 auto; padding:18px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; }
+    .nav a { text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; font-weight:700; }
+    .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .version { color:var(--muted); font-size:.9rem; font-weight:700; background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; }
+    h1 { margin:0 0 6px; font-size:1.9rem; } h2 { margin:0 0 12px; } .sub { margin:0 0 18px; color:var(--muted); }
+    .grid { display:grid; gap:16px; grid-template-columns:repeat(12,1fr); }
+    .card { grid-column:span 12; background:var(--card); border:1px solid rgba(0,0,0,0.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; }
+    .row { display:grid; gap:12px; grid-template-columns:repeat(12,1fr); align-items:end; }
+    .field { grid-column:span 12; } .field.half { grid-column:span 6; } .field.third { grid-column:span 4; } .field.quarter { grid-column:span 3; }
+    label { display:block; margin-bottom:6px; font-size:.92rem; color:var(--muted); font-weight:600; }
+    input, select, button { width:100%; min-height:44px; border-radius:12px; border:1px solid var(--border); padding:10px 12px; font-size:1rem; background:#fff; }
+    button { background:var(--accent); color:#fff; border:none; font-weight:700; cursor:pointer; }
+    button:hover { background:var(--accent2); }
+    button.secondary { background:#e5e7eb; color:#111827; } button.secondary:hover { background:#d1d5db; }
+    button.danger { background:var(--danger); } button.small { width:auto; min-height:36px; padding:8px 10px; }
+    .totals { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .tile { background:#f9fafb; border:1px solid #e5e7eb; border-radius:14px; padding:14px; }
+    .tile .label { color:var(--muted); font-size:.9rem; margin-bottom:6px; font-weight:700; }
+    .tile .value { font-size:1.35rem; font-weight:800; }
+    .tile .goal { margin-top:4px; color:var(--good); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; margin-top:8px; } th,td { text-align:left; padding:10px 8px; border-bottom:1px solid #e5e7eb; vertical-align:top; } th { color:var(--muted); font-size:.9rem; }
+    .empty { color:var(--muted); padding:12px 0 4px; } .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .pill { display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 8px; border-radius:999px; font-size:.85rem; font-weight:700; }
+    .footer-note,.inline-note { margin-top:8px; color:var(--muted); font-size:.92rem; }
+    .check-grid { display:grid; gap:10px; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:8px; }
+    .check-item { display:flex; align-items:center; gap:10px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:14px; padding:12px 14px; min-height:52px; }
+    .check-item input[type='checkbox'] { width:20px; min-height:20px; margin:0; accent-color:var(--accent); }
+    .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
+    .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
+    .hidden { display:none !important; }
+    @media (max-width:900px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media (max-width:760px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:1fr;} .field.half,.field.third,.field.quarter{grid-column:span 12;} }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="nav">
-        <a class="active" href="./index.html">Tracker</a>
-        <a href="./reports.html">Reports</a>
+      <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
+      <div class="version">Version 4.0</div>
+    </div>
+
+    <section class="card" id="loginCard">
+      <h1>CnKTracker</h1>
+      <p class="sub">One shared household login, with Chat and Kit as separate profiles inside the app.</p>
+      <div class="row">
+        <div class="field half"><label for="email">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="username" /></div>
+        <div class="field half"><label for="password">Password</label><input id="password" type="password" placeholder="Password" autocomplete="current-password" /></div>
+        <div class="field"><button id="signInBtn">Sign In</button></div>
       </div>
-      <div class="version">Version 3.0</div>
-    </div>
+      <div id="loginStatus" class="status" style="margin-top:12px;">Sign in with the Supabase user you created for the household app.</div>
+    </section>
 
-    <h1>Macro Tracker</h1>
-    <p class="sub">Simple local tracking for the things you actually care about. Data is stored on this device/browser only.</p>
+    <section id="appShell" class="hidden">
+      <h1>Macro Tracker</h1>
+      <p class="sub">Synced with Supabase, so the same data should follow you across devices after sign-in.</p>
 
-    <div class="grid">
-      <section class="card">
-        <div class="row">
-          <div class="field half">
-            <label for="person">Profile</label>
-            <select id="person">
-              <option value="Chad">Chad</option>
-              <option value="Andrea">Andrea</option>
-            </select>
+      <div class="grid">
+        <section class="card">
+          <div class="row">
+            <div class="field half"><label for="profile">Profile</label><select id="profile"></select></div>
+            <div class="field half"><label for="date">Date</label><input id="date" type="date" /></div>
           </div>
-          <div class="field half">
-            <label for="date">Date</label>
-            <input id="date" type="date" />
+          <div class="actions" style="margin-top:12px;">
+            <button class="secondary" id="signOutBtn">Sign Out</button>
+            <button class="secondary" id="refreshBtn">Refresh Page</button>
           </div>
-        </div>
-      </section>
+          <div id="sessionStatus" class="status" style="margin-top:12px;"></div>
+        </section>
 
-      <section class="card">
-        <h2>Add Food Entry</h2>
-        <div class="row">
-          <div class="field half">
-            <label for="meal">Meal</label>
-            <select id="meal">
-              <option>Breakfast</option>
-              <option>Lunch</option>
-              <option>Dinner</option>
-              <option>Snack</option>
-            </select>
+        <section class="card">
+          <h2>Add Food Entry</h2>
+          <div class="row">
+            <div class="field half"><label for="meal">Meal</label><select id="meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+            <div class="field half"><label for="foodName">Food Name</label><input id="foodName" type="text" placeholder="Greek yogurt" /></div>
+            <div class="field quarter metric-input metric-calories"><label for="calories">Calories</label><input id="calories" type="number" min="0" step="1" placeholder="150" /></div>
+            <div class="field quarter metric-input metric-protein"><label for="protein">Protein (g)</label><input id="protein" type="number" min="0" step="0.1" placeholder="15" /></div>
+            <div class="field quarter metric-input metric-carbs"><label for="carbs">Carbs (g)</label><input id="carbs" type="number" min="0" step="0.1" placeholder="10" /></div>
+            <div class="field quarter metric-input metric-fat"><label for="fat">Fat (g)</label><input id="fat" type="number" min="0" step="0.1" placeholder="5" /></div>
+            <div class="field quarter metric-input metric-sugar"><label for="sugar">Sugar (g)</label><input id="sugar" type="number" min="0" step="0.1" placeholder="8" /></div>
+            <div class="field quarter metric-input metric-fiber"><label for="fiber">Fiber (g)</label><input id="fiber" type="number" min="0" step="0.1" placeholder="2" /></div>
+            <div class="field"><button id="addEntryBtn">Add Entry</button></div>
           </div>
-          <div class="field half">
-            <label for="foodName">Food Name</label>
-            <input id="foodName" type="text" placeholder="Greek yogurt" />
-          </div>
+        </section>
 
-          <div class="field quarter metric-input metric-calories">
-            <label for="calories">Calories</label>
-            <input id="calories" type="number" min="0" step="1" placeholder="150" />
+        <section class="card">
+          <div class="pill">Daily Totals So Far</div>
+          <div class="totals" style="margin-top:14px;">
+            <div class="tile metric-calories"><div class="label">Calories</div><div class="value" id="totalCalories">0</div><div class="goal" id="goalCalories">Goal: 0</div></div>
+            <div class="tile metric-protein"><div class="label">Protein</div><div class="value" id="totalProtein">0g</div><div class="goal" id="goalProtein">Goal: 0g</div></div>
+            <div class="tile metric-carbs"><div class="label">Carbs</div><div class="value" id="totalCarbs">0g</div><div class="goal" id="goalCarbs">Goal: 0g</div></div>
+            <div class="tile metric-fat"><div class="label">Fat</div><div class="value" id="totalFat">0g</div><div class="goal" id="goalFat">Goal: 0g</div></div>
+            <div class="tile metric-sugar"><div class="label">Sugar</div><div class="value" id="totalSugar">0g</div><div class="goal" id="goalSugar">Goal: 0g</div></div>
+            <div class="tile metric-fiber"><div class="label">Fiber</div><div class="value" id="totalFiber">0g</div><div class="goal" id="goalFiber">Goal: 0g</div></div>
           </div>
-          <div class="field quarter metric-input metric-protein">
-            <label for="protein">Protein (g)</label>
-            <input id="protein" type="number" min="0" step="1" placeholder="15" />
-          </div>
-          <div class="field quarter metric-input metric-carbs">
-            <label for="carbs">Carbs (g)</label>
-            <input id="carbs" type="number" min="0" step="1" placeholder="10" />
-          </div>
-          <div class="field quarter metric-input metric-fat">
-            <label for="fat">Fat (g)</label>
-            <input id="fat" type="number" min="0" step="1" placeholder="5" />
-          </div>
-          <div class="field quarter metric-input metric-sugar">
-            <label for="sugar">Sugar (g)</label>
-            <input id="sugar" type="number" min="0" step="1" placeholder="8" />
-          </div>
-          <div class="field quarter metric-input metric-fiber">
-            <label for="fiber">Fiber (g)</label>
-            <input id="fiber" type="number" min="0" step="1" placeholder="2" />
-          </div>
+        </section>
 
-          <div class="field">
-            <button id="addEntryBtn">Add Entry</button>
+        <section class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <h2 style="margin:0;">Entries</h2>
+            <div class="actions"><button class="danger" id="clearDayBtn">Delete All for This Day</button></div>
           </div>
-        </div>
-      </section>
+          <div id="entriesWrap"></div>
+          <div class="footer-note">This version reads and writes entries directly from Supabase instead of local-only browser storage.</div>
+        </section>
 
-      <section class="card">
-        <div class="pill">Daily Totals So Far</div>
-        <div class="totals" style="margin-top:14px;">
-          <div class="tile metric-calories">
-            <div class="label">Calories</div>
-            <div class="value" id="totalCalories">0</div>
-            <div class="goal" id="goalCalories">Goal: 0</div>
+        <section class="card">
+          <h2>Daily Goals</h2>
+          <div class="inline-note">Set goals only for the metrics you want this profile to track.</div>
+          <div class="row" style="margin-top:8px;">
+            <div class="field third metric-goal metric-calories"><label for="goalCalInput">Calories</label><input id="goalCalInput" type="number" min="0" step="0.1" placeholder="2000" /></div>
+            <div class="field third metric-goal metric-protein"><label for="goalProteinInput">Protein (g)</label><input id="goalProteinInput" type="number" min="0" step="0.1" placeholder="180" /></div>
+            <div class="field third metric-goal metric-carbs"><label for="goalCarbsInput">Carbs (g)</label><input id="goalCarbsInput" type="number" min="0" step="0.1" placeholder="180" /></div>
+            <div class="field third metric-goal metric-fat"><label for="goalFatInput">Fat (g)</label><input id="goalFatInput" type="number" min="0" step="0.1" placeholder="70" /></div>
+            <div class="field third metric-goal metric-sugar"><label for="goalSugarInput">Sugar (g)</label><input id="goalSugarInput" type="number" min="0" step="0.1" placeholder="40" /></div>
+            <div class="field third metric-goal metric-fiber"><label for="goalFiberInput">Fiber (g)</label><input id="goalFiberInput" type="number" min="0" step="0.1" placeholder="30" /></div>
+            <div class="field"><button id="saveGoalsBtn">Save Goals for This Profile</button></div>
           </div>
-          <div class="tile metric-protein">
-            <div class="label">Protein</div>
-            <div class="value" id="totalProtein">0g</div>
-            <div class="goal" id="goalProtein">Goal: 0g</div>
-          </div>
-          <div class="tile metric-carbs">
-            <div class="label">Carbs</div>
-            <div class="value" id="totalCarbs">0g</div>
-            <div class="goal" id="goalCarbs">Goal: 0g</div>
-          </div>
-          <div class="tile metric-fat">
-            <div class="label">Fat</div>
-            <div class="value" id="totalFat">0g</div>
-            <div class="goal" id="goalFat">Goal: 0g</div>
-          </div>
-          <div class="tile metric-sugar">
-            <div class="label">Sugar</div>
-            <div class="value" id="totalSugar">0g</div>
-            <div class="goal" id="goalSugar">Goal: 0g</div>
-          </div>
-          <div class="tile metric-fiber">
-            <div class="label">Fiber</div>
-            <div class="value" id="totalFiber">0g</div>
-            <div class="goal" id="goalFiber">Goal: 0g</div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="card">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <h2 style="margin:0;">Entries</h2>
-          <div class="actions">
-            <button class="secondary" id="exportBtn">Export Backup</button>
-            <button class="secondary" id="importBtn">Import Backup</button>
-            <button class="danger" id="clearDayBtn">Delete All for This Day</button>
-            <input id="importFile" type="file" accept="application/json" style="display:none;" />
+        <section class="card">
+          <h2>Tracking Options</h2>
+          <div class="inline-note">Choose which metrics this profile wants to track. Hidden metrics disappear from the form, totals, goals, and entries table.</div>
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" id="trackCalories" /> <span>Calories</span></label>
+            <label class="check-item"><input type="checkbox" id="trackProtein" /> <span>Protein</span></label>
+            <label class="check-item"><input type="checkbox" id="trackCarbs" /> <span>Carbs</span></label>
+            <label class="check-item"><input type="checkbox" id="trackFat" /> <span>Fat</span></label>
+            <label class="check-item"><input type="checkbox" id="trackSugar" /> <span>Sugar</span></label>
+            <label class="check-item"><input type="checkbox" id="trackFiber" /> <span>Fiber</span></label>
           </div>
-        </div>
-        <div id="entriesWrap"></div>
-        <div class="footer-note">Tip: this app stores data only on the current device/browser. Export a backup occasionally if you want a safety copy.</div>
-      </section>
-
-      <section class="card">
-        <h2>Daily Goals</h2>
-        <div class="inline-note">Set goals only for the metrics you want this person to track.</div>
-        <div class="row" style="margin-top:8px;">
-          <div class="field third metric-goal metric-calories">
-            <label for="goalCalInput">Calories</label>
-            <input id="goalCalInput" type="number" min="0" step="1" placeholder="2000" />
-          </div>
-          <div class="field third metric-goal metric-protein">
-            <label for="goalProteinInput">Protein (g)</label>
-            <input id="goalProteinInput" type="number" min="0" step="1" placeholder="180" />
-          </div>
-          <div class="field third metric-goal metric-carbs">
-            <label for="goalCarbsInput">Carbs (g)</label>
-            <input id="goalCarbsInput" type="number" min="0" step="1" placeholder="180" />
-          </div>
-          <div class="field third metric-goal metric-fat">
-            <label for="goalFatInput">Fat (g)</label>
-            <input id="goalFatInput" type="number" min="0" step="1" placeholder="70" />
-          </div>
-          <div class="field third metric-goal metric-sugar">
-            <label for="goalSugarInput">Sugar (g)</label>
-            <input id="goalSugarInput" type="number" min="0" step="1" placeholder="40" />
-          </div>
-          <div class="field third metric-goal metric-fiber">
-            <label for="goalFiberInput">Fiber (g)</label>
-            <input id="goalFiberInput" type="number" min="0" step="1" placeholder="30" />
-          </div>
-          <div class="field">
-            <button id="saveGoalsBtn">Save Goals for This Person</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Tracking Options</h2>
-        <div class="inline-note">Choose which metrics this person wants to track. Hidden metrics disappear from the form, totals, goals, and entries table.</div>
-        <div class="check-grid">
-          <label class="check-item"><input type="checkbox" id="trackCalories" /> <span>Calories</span></label>
-          <label class="check-item"><input type="checkbox" id="trackProtein" /> <span>Protein</span></label>
-          <label class="check-item"><input type="checkbox" id="trackCarbs" /> <span>Carbs</span></label>
-          <label class="check-item"><input type="checkbox" id="trackFat" /> <span>Fat</span></label>
-          <label class="check-item"><input type="checkbox" id="trackSugar" /> <span>Sugar</span></label>
-          <label class="check-item"><input type="checkbox" id="trackFiber" /> <span>Fiber</span></label>
-        </div>
-        <div class="field" style="margin-top:14px;">
-          <button id="saveTrackingBtn">Save Tracking Options for This Person</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>App Tools</h2>
-        <div class="inline-note">Use Refresh when the Home Screen web app seems stuck on an older view.</div>
-        <div class="actions" style="margin-top:12px;">
-          <button class="secondary" id="refreshBtn">Refresh Page</button>
-        </div>
-      </section>
-    </div>
+          <div class="field" style="margin-top:14px;"><button id="saveTrackingBtn">Save Tracking Options for This Profile</button></div>
+        </section>
+      </div>
+    </section>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
   <script>
-    const APP_VERSION = '3.0';
-    const STORAGE_KEY = 'macroTrackerV3';
-    const PREVIOUS_KEYS = ['macroTrackerV2_1', 'macroTrackerV2', 'macroTrackerV1'];
-    const METRICS = ['calories', 'protein', 'carbs', 'fat', 'sugar', 'fiber'];
-    const DEFAULT_TRACKING = {
-      calories: true, protein: true, carbs: true, fat: true, sugar: true, fiber: true
-    };
+    const METRICS = ['calories','protein','carbs','fat','sugar','fiber'];
+    const LAST_PROFILE_KEY = 'cnktracker-last-profile-id';
+    const cfg = window.CNK_CONFIG || {};
+    const supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
     const el = {
-      person: document.getElementById('person'),
+      loginCard: document.getElementById('loginCard'),
+      appShell: document.getElementById('appShell'),
+      email: document.getElementById('email'),
+      password: document.getElementById('password'),
+      signInBtn: document.getElementById('signInBtn'),
+      signOutBtn: document.getElementById('signOutBtn'),
+      loginStatus: document.getElementById('loginStatus'),
+      sessionStatus: document.getElementById('sessionStatus'),
+      profile: document.getElementById('profile'),
       date: document.getElementById('date'),
-      goalCalInput: document.getElementById('goalCalInput'),
-      goalProteinInput: document.getElementById('goalProteinInput'),
-      goalCarbsInput: document.getElementById('goalCarbsInput'),
-      goalFatInput: document.getElementById('goalFatInput'),
-      goalSugarInput: document.getElementById('goalSugarInput'),
-      goalFiberInput: document.getElementById('goalFiberInput'),
-      saveGoalsBtn: document.getElementById('saveGoalsBtn'),
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
       calories: document.getElementById('calories'),
@@ -332,6 +187,13 @@
       goalFat: document.getElementById('goalFat'),
       goalSugar: document.getElementById('goalSugar'),
       goalFiber: document.getElementById('goalFiber'),
+      goalCalInput: document.getElementById('goalCalInput'),
+      goalProteinInput: document.getElementById('goalProteinInput'),
+      goalCarbsInput: document.getElementById('goalCarbsInput'),
+      goalFatInput: document.getElementById('goalFatInput'),
+      goalSugarInput: document.getElementById('goalSugarInput'),
+      goalFiberInput: document.getElementById('goalFiberInput'),
+      saveGoalsBtn: document.getElementById('saveGoalsBtn'),
       trackCalories: document.getElementById('trackCalories'),
       trackProtein: document.getElementById('trackProtein'),
       trackCarbs: document.getElementById('trackCarbs'),
@@ -341,126 +203,75 @@
       saveTrackingBtn: document.getElementById('saveTrackingBtn'),
       entriesWrap: document.getElementById('entriesWrap'),
       clearDayBtn: document.getElementById('clearDayBtn'),
-      exportBtn: document.getElementById('exportBtn'),
-      importBtn: document.getElementById('importBtn'),
-      importFile: document.getElementById('importFile'),
       refreshBtn: document.getElementById('refreshBtn')
     };
 
-    function todayString() {
-      const d = new Date();
-      const tzOffset = d.getTimezoneOffset() * 60000;
-      return new Date(d - tzOffset).toISOString().slice(0, 10);
-    }
-    function defaultGoals() { return { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, fiber: 0 }; }
-    function defaultTracking() { return { ...DEFAULT_TRACKING }; }
-    function defaultState() {
-      return {
-        version: APP_VERSION,
-        goals: { Chad: defaultGoals(), Andrea: defaultGoals() },
-        tracking: { Chad: defaultTracking(), Andrea: defaultTracking() },
-        entries: { Chad: {}, Andrea: {} }
-      };
-    }
-    function tryLoadKey(key) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      } catch { return null; }
-    }
-    function normalizeState(parsed) {
-      return {
-        version: APP_VERSION,
-        goals: {
-          Chad: { ...defaultGoals(), ...(parsed.goals?.Chad || {}) },
-          Andrea: { ...defaultGoals(), ...(parsed.goals?.Andrea || {}) }
-        },
-        tracking: {
-          Chad: { ...defaultTracking(), ...(parsed.tracking?.Chad || {}) },
-          Andrea: { ...defaultTracking(), ...(parsed.tracking?.Andrea || {}) }
-        },
-        entries: {
-          Chad: parsed.entries?.Chad || {},
-          Andrea: parsed.entries?.Andrea || {}
-        }
-      };
-    }
-    function loadState() {
-      const current = tryLoadKey(STORAGE_KEY);
-      if (current) return normalizeState(current);
-      for (const key of PREVIOUS_KEYS) {
-        const older = tryLoadKey(key);
-        if (older) return normalizeState(older);
+    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [];
+
+    function todayString(){ const d=new Date(); const tz=d.getTimezoneOffset()*60000; return new Date(d-tz).toISOString().slice(0,10); }
+    function formatNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1}); }
+    function metricSuffix(m){ return m==='calories' ? '' : 'g'; }
+    function metricLabel(m){ return {calories:'Calories',protein:'Protein',carbs:'Carbs',fat:'Fat',sugar:'Sugar',fiber:'Fiber'}[m]||m; }
+    function setStatus(node,msg,kind=''){ node.textContent=msg; node.className='status'+(kind?' '+kind:''); }
+    function escapeHtml(str){ return String(str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+    function selectedProfileId(){ return el.profile.value||''; }
+    function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
+    function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
+
+    function requireConfig(){
+      if (!cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY || cfg.SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE')) {
+        setStatus(el.loginStatus,'Add your real publishable key in config.js before using this version.','warning');
+        el.signInBtn.disabled = true;
+        return false;
       }
-      return defaultState();
+      return true;
     }
-    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    function getCurrentPerson() { return el.person.value; }
-    function getCurrentDate() { return el.date.value || todayString(); }
-    function getCurrentTracking() { return state.tracking[getCurrentPerson()] || defaultTracking(); }
-    function getEntriesForCurrentDay() { return state.entries[getCurrentPerson()][getCurrentDate()] || []; }
-    function setEntriesForCurrentDay(entries) {
-      state.entries[getCurrentPerson()][getCurrentDate()] = entries;
-      saveState();
-    }
-    function formatNum(n) { return Number(n || 0).toLocaleString(); }
-    function metricSuffix(metric) { return metric === 'calories' ? '' : 'g'; }
-    function metricLabel(metric) {
-      return { calories:'Calories', protein:'Protein', carbs:'Carbs', fat:'Fat', sugar:'Sugar', fiber:'Fiber' }[metric] || metric;
-    }
-    function escapeHtml(str) {
-      return String(str || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
-    }
-    function applyTrackingVisibility() {
-      const tracking = getCurrentTracking();
-      METRICS.forEach(metric => {
-        const visible = !!tracking[metric];
-        document.querySelectorAll('.metric-' + metric).forEach(node => node.classList.toggle('hidden', !visible));
+
+    function applyTrackingVisibility(){
+      const t = currentTracking || {};
+      METRICS.forEach(m => {
+        const visible = t['track_'+m] !== false;
+        document.querySelectorAll('.metric-'+m).forEach(node => node.classList.toggle('hidden', !visible));
       });
-      el.trackCalories.checked = !!tracking.calories;
-      el.trackProtein.checked = !!tracking.protein;
-      el.trackCarbs.checked = !!tracking.carbs;
-      el.trackFat.checked = !!tracking.fat;
-      el.trackSugar.checked = !!tracking.sugar;
-      el.trackFiber.checked = !!tracking.fiber;
+      el.trackCalories.checked = currentTracking?.track_calories ?? true;
+      el.trackProtein.checked = currentTracking?.track_protein ?? true;
+      el.trackCarbs.checked = currentTracking?.track_carbs ?? true;
+      el.trackFat.checked = currentTracking?.track_fat ?? true;
+      el.trackSugar.checked = currentTracking?.track_sugar ?? true;
+      el.trackFiber.checked = currentTracking?.track_fiber ?? true;
     }
-    function refreshGoalsUI() {
-      const goals = state.goals[getCurrentPerson()];
-      el.goalCalInput.value = goals.calories || '';
-      el.goalProteinInput.value = goals.protein || '';
-      el.goalCarbsInput.value = goals.carbs || '';
-      el.goalFatInput.value = goals.fat || '';
-      el.goalSugarInput.value = goals.sugar || '';
-      el.goalFiberInput.value = goals.fiber || '';
-      el.goalCalories.textContent = `Goal: ${formatNum(goals.calories)}`;
-      el.goalProtein.textContent = `Goal: ${formatNum(goals.protein)}g`;
-      el.goalCarbs.textContent = `Goal: ${formatNum(goals.carbs)}g`;
-      el.goalFat.textContent = `Goal: ${formatNum(goals.fat)}g`;
-      el.goalSugar.textContent = `Goal: ${formatNum(goals.sugar)}g`;
-      el.goalFiber.textContent = `Goal: ${formatNum(goals.fiber)}g`;
+
+    function refreshGoalsUI(){
+      const g = currentGoals || {};
+      el.goalCalInput.value = g.calories ?? '';
+      el.goalProteinInput.value = g.protein ?? '';
+      el.goalCarbsInput.value = g.carbs ?? '';
+      el.goalFatInput.value = g.fat ?? '';
+      el.goalSugarInput.value = g.sugar ?? '';
+      el.goalFiberInput.value = g.fiber ?? '';
+      el.goalCalories.textContent = `Goal: ${formatNum(g.calories)}`;
+      el.goalProtein.textContent = `Goal: ${formatNum(g.protein)}g`;
+      el.goalCarbs.textContent = `Goal: ${formatNum(g.carbs)}g`;
+      el.goalFat.textContent = `Goal: ${formatNum(g.fat)}g`;
+      el.goalSugar.textContent = `Goal: ${formatNum(g.sugar)}g`;
+      el.goalFiber.textContent = `Goal: ${formatNum(g.fiber)}g`;
     }
-    function buildEntriesTable(entries) {
-      const tracking = getCurrentTracking();
-      const trackedMetrics = METRICS.filter(metric => tracking[metric]);
-      const headerCells = ['Meal', 'Food'].concat(trackedMetrics.map(metric => metricLabel(metric))).concat(['']);
+
+    function buildEntriesTable(entries){
+      const tracked = METRICS.filter(m => currentTracking?.['track_'+m] !== false);
+      const headerCells = ['Meal','Food'].concat(tracked.map(metricLabel)).concat(['']);
       const rows = entries.map((item, index) => {
-        const valueCells = trackedMetrics.map(metric => `<td>${formatNum(item[metric] || 0)}${metricSuffix(metric)}</td>`).join('');
-        return `<tr>
-          <td>${escapeHtml(item.meal)}</td>
-          <td>${escapeHtml(item.foodName)}</td>
-          ${valueCells}
-          <td><button class="danger" data-delete-index="${index}" style="min-height:36px;padding:8px 10px;">Delete</button></td>
-        </tr>`;
+        const valueCells = tracked.map(m => `<td>${formatNum(item[m]||0)}${metricSuffix(m)}</td>`).join('');
+        return `<tr><td>${item.meal}</td><td>${escapeHtml(item.food_name)}</td>${valueCells}<td><button class="danger small" data-delete-index="${index}">Delete</button></td></tr>`;
       }).join('');
       return `<table><thead><tr>${headerCells.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
     }
-    function refreshTotalsAndEntries() {
-      const entries = getEntriesForCurrentDay();
-      const totals = entries.reduce((acc, item) => {
-        METRICS.forEach(metric => { acc[metric] += Number(item[metric] || 0); });
+
+    function refreshTotalsAndEntries(){
+      const totals = currentEntries.reduce((acc,item) => {
+        METRICS.forEach(m => acc[m] += Number(item[m]||0));
         return acc;
-      }, { calories:0, protein:0, carbs:0, fat:0, sugar:0, fiber:0 });
+      }, {calories:0,protein:0,carbs:0,fat:0,sugar:0,fiber:0});
       el.totalCalories.textContent = formatNum(totals.calories);
       el.totalProtein.textContent = `${formatNum(totals.protein)}g`;
       el.totalCarbs.textContent = `${formatNum(totals.carbs)}g`;
@@ -468,132 +279,179 @@
       el.totalSugar.textContent = `${formatNum(totals.sugar)}g`;
       el.totalFiber.textContent = `${formatNum(totals.fiber)}g`;
 
-      if (!entries.length) {
+      if (!currentEntries.length) {
         el.entriesWrap.innerHTML = '<div class="empty">No entries yet for this day.</div>';
         return;
       }
-      el.entriesWrap.innerHTML = buildEntriesTable(entries);
+      el.entriesWrap.innerHTML = buildEntriesTable(currentEntries);
       el.entriesWrap.querySelectorAll('[data-delete-index]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const idx = Number(btn.getAttribute('data-delete-index'));
-          const current = getEntriesForCurrentDay();
-          current.splice(idx, 1);
-          setEntriesForCurrentDay(current);
-          refreshTotalsAndEntries();
+          const row = currentEntries[idx];
+          if (!row) return;
+          const { error } = await supabase.from('daily_entries').delete().eq('id', row.id);
+          if (error) { alert(error.message); return; }
+          await loadEntries();
         });
       });
     }
-    function refreshAll() {
-      applyTrackingVisibility();
-      refreshGoalsUI();
-      refreshTotalsAndEntries();
-    }
-    function addEntry() {
-      const foodName = el.foodName.value.trim();
-      if (!foodName) {
-        alert('Please enter a food name.');
-        el.foodName.focus();
-        return;
-      }
-      const entry = {
-        meal: el.meal.value,
-        foodName,
-        calories: Number(el.calories.value || 0),
-        protein: Number(el.protein.value || 0),
-        carbs: Number(el.carbs.value || 0),
-        fat: Number(el.fat.value || 0),
-        sugar: Number(el.sugar.value || 0),
-        fiber: Number(el.fiber.value || 0)
-      };
-      const current = getEntriesForCurrentDay();
-      current.push(entry);
-      setEntriesForCurrentDay(current);
-      el.foodName.value = '';
-      el.calories.value = '';
-      el.protein.value = '';
-      el.carbs.value = '';
-      el.fat.value = '';
-      el.sugar.value = '';
-      el.fiber.value = '';
-      el.foodName.focus();
-      refreshTotalsAndEntries();
-    }
-    function saveGoals() {
-      state.goals[getCurrentPerson()] = {
-        calories: Number(el.goalCalInput.value || 0),
-        protein: Number(el.goalProteinInput.value || 0),
-        carbs: Number(el.goalCarbsInput.value || 0),
-        fat: Number(el.goalFatInput.value || 0),
-        sugar: Number(el.goalSugarInput.value || 0),
-        fiber: Number(el.goalFiberInput.value || 0)
-      };
-      saveState();
-      refreshGoalsUI();
-      alert(`Goals saved for ${getCurrentPerson()}.`);
-    }
-    function saveTrackingOptions() {
-      const updated = {
-        calories: el.trackCalories.checked, protein: el.trackProtein.checked, carbs: el.trackCarbs.checked,
-        fat: el.trackFat.checked, sugar: el.trackSugar.checked, fiber: el.trackFiber.checked
-      };
-      if (!Object.values(updated).some(Boolean)) {
-        alert('Please leave at least one tracking option turned on.');
-        return;
-      }
-      state.tracking[getCurrentPerson()] = updated;
-      saveState();
-      refreshAll();
-      alert(`Tracking options saved for ${getCurrentPerson()}.`);
-    }
-    function clearDay() {
-      if (!confirm(`Delete all entries for ${getCurrentPerson()} on ${getCurrentDate()}?`)) return;
-      state.entries[getCurrentPerson()][getCurrentDate()] = [];
-      saveState();
-      refreshTotalsAndEntries();
-    }
-    function exportBackup() {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `macro-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    }
-    function importBackup(file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const parsed = JSON.parse(reader.result);
-          state = normalizeState(parsed);
-          saveState();
-          refreshAll();
-          alert('Backup imported successfully.');
-        } catch { alert('That file could not be imported.'); }
-      };
-      reader.readAsText(file);
+
+    async function ensureProfileRows(profileId){
+      const { data: goalsRow } = await supabase.from('goals').select('*').eq('profile_id', profileId).maybeSingle();
+      if (!goalsRow) await supabase.from('goals').insert({ user_id: currentUser.id, profile_id: profileId });
+      const { data: trackingRow } = await supabase.from('tracking_options').select('*').eq('profile_id', profileId).maybeSingle();
+      if (!trackingRow) await supabase.from('tracking_options').insert({ user_id: currentUser.id, profile_id: profileId });
     }
 
-    let state = loadState();
-    saveState();
-    el.date.value = todayString();
-    el.person.addEventListener('change', refreshAll);
-    el.date.addEventListener('change', refreshAll);
+    async function loadProfiles(){
+      const { data, error } = await supabase.from('profiles').select('*').order('name');
+      if (error) throw error;
+      profiles = data || [];
+      el.profile.innerHTML = profiles.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+      const last = localStorage.getItem(LAST_PROFILE_KEY);
+      const chosen = profiles.find(p => p.id === last) || profiles[0];
+      if (chosen) { el.profile.value = chosen.id; saveLastProfileId(chosen.id); }
+    }
+
+    async function loadGoalsAndTracking(){
+      const profileId = selectedProfileId();
+      if (!profileId) return;
+      await ensureProfileRows(profileId);
+      const [{ data: goalsRow, error: goalsError }, { data: trackingRow, error: trackingError }] = await Promise.all([
+        supabase.from('goals').select('*').eq('profile_id', profileId).single(),
+        supabase.from('tracking_options').select('*').eq('profile_id', profileId).single()
+      ]);
+      if (goalsError) throw goalsError;
+      if (trackingError) throw trackingError;
+      currentGoals = goalsRow;
+      currentTracking = trackingRow;
+      applyTrackingVisibility();
+      refreshGoalsUI();
+    }
+
+    async function loadEntries(){
+      const profileId = selectedProfileId();
+      if (!profileId || !el.date.value) return;
+      const { data, error } = await supabase.from('daily_entries').select('*').eq('profile_id', profileId).eq('entry_date', el.date.value).order('created_at', { ascending: true });
+      if (error) throw error;
+      currentEntries = data || [];
+      refreshTotalsAndEntries();
+    }
+
+    async function loadProfileData(){
+      saveLastProfileId(selectedProfileId());
+      await loadGoalsAndTracking();
+      await loadEntries();
+      const profile = selectedProfile();
+      setStatus(el.sessionStatus, `Signed in as ${currentUser.email}. Current profile: ${profile ? profile.name : 'None selected'}.`, 'success');
+    }
+
+    async function addEntry(){
+      const profile = selectedProfile();
+      if (!profile) { alert('No profile selected.'); return; }
+      const foodName = el.foodName.value.trim();
+      if (!foodName) { alert('Please enter a food name.'); el.foodName.focus(); return; }
+      const payload = {
+        user_id: currentUser.id, profile_id: profile.id, entry_date: el.date.value, meal: el.meal.value, food_name: foodName,
+        calories: Number(el.calories.value || 0), protein: Number(el.protein.value || 0), carbs: Number(el.carbs.value || 0),
+        fat: Number(el.fat.value || 0), sugar: Number(el.sugar.value || 0), fiber: Number(el.fiber.value || 0)
+      };
+      const { error } = await supabase.from('daily_entries').insert(payload);
+      if (error) { alert(error.message); return; }
+      ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
+      el.foodName.focus();
+      await loadEntries();
+    }
+
+    async function saveGoals(){
+      const profile = selectedProfile();
+      if (!profile || !currentGoals) return;
+      const payload = {
+        calories: Number(el.goalCalInput.value || 0), protein: Number(el.goalProteinInput.value || 0), carbs: Number(el.goalCarbsInput.value || 0),
+        fat: Number(el.goalFatInput.value || 0), sugar: Number(el.goalSugarInput.value || 0), fiber: Number(el.goalFiberInput.value || 0)
+      };
+      const { error } = await supabase.from('goals').update(payload).eq('id', currentGoals.id);
+      if (error) { alert(error.message); return; }
+      await loadGoalsAndTracking();
+      alert(`Goals saved for ${profile.name}.`);
+    }
+
+    async function saveTrackingOptions(){
+      const profile = selectedProfile();
+      if (!profile || !currentTracking) return;
+      const payload = {
+        track_calories: el.trackCalories.checked, track_protein: el.trackProtein.checked, track_carbs: el.trackCarbs.checked,
+        track_fat: el.trackFat.checked, track_sugar: el.trackSugar.checked, track_fiber: el.trackFiber.checked
+      };
+      if (!Object.values(payload).some(Boolean)) { alert('Please leave at least one tracking option turned on.'); return; }
+      const { error } = await supabase.from('tracking_options').update(payload).eq('id', currentTracking.id);
+      if (error) { alert(error.message); return; }
+      await loadGoalsAndTracking();
+      await loadEntries();
+      alert(`Tracking options saved for ${profile.name}.`);
+    }
+
+    async function clearDay(){
+      const profile = selectedProfile();
+      if (!profile) return;
+      if (!confirm(`Delete all entries for ${profile.name} on ${el.date.value}?`)) return;
+      const { error } = await supabase.from('daily_entries').delete().eq('profile_id', profile.id).eq('entry_date', el.date.value);
+      if (error) { alert(error.message); return; }
+      await loadEntries();
+    }
+
+    async function signIn(){
+      const email = el.email.value.trim(), password = el.password.value;
+      if (!email || !password) { setStatus(el.loginStatus,'Enter your email and password first.','warning'); return; }
+      el.signInBtn.disabled = true; setStatus(el.loginStatus,'Signing in...');
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      el.signInBtn.disabled = false;
+      if (error) { setStatus(el.loginStatus,error.message,'warning'); return; }
+      currentUser = data.user;
+      await bootApp();
+    }
+
+    async function signOut(){
+      await supabase.auth.signOut();
+      currentUser = null; profiles = []; currentGoals = null; currentTracking = null; currentEntries = [];
+      el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden');
+      setStatus(el.loginStatus,'Signed out. Sign back in whenever you want.','success');
+    }
+
+    async function bootApp(){
+      try {
+        el.date.value = el.date.value || todayString();
+        await loadProfiles();
+        if (!profiles.length) throw new Error('No profiles found. Make sure Chat and Kit exist in the profiles table.');
+        await loadProfileData();
+        el.loginCard.classList.add('hidden'); el.appShell.classList.remove('hidden');
+      } catch (err) {
+        setStatus(el.loginStatus, err.message || 'Something went wrong while loading the app.', 'warning');
+        el.loginCard.classList.remove('hidden'); el.appShell.classList.add('hidden');
+      }
+    }
+
+    async function init(){
+      if (!requireConfig()) return;
+      el.date.value = todayString();
+      const { data: sessionData } = await supabase.auth.getSession();
+      currentUser = sessionData.session?.user || null;
+      if (currentUser) await bootApp();
+      else setStatus(el.loginStatus,'Sign in with the shared household login to load Chat and Kit.','');
+    }
+
+    el.signInBtn.addEventListener('click', signIn);
+    el.signOutBtn.addEventListener('click', signOut);
+    el.profile.addEventListener('change', loadProfileData);
+    el.date.addEventListener('change', loadEntries);
     el.addEntryBtn.addEventListener('click', addEntry);
     el.saveGoalsBtn.addEventListener('click', saveGoals);
     el.saveTrackingBtn.addEventListener('click', saveTrackingOptions);
     el.clearDayBtn.addEventListener('click', clearDay);
-    el.exportBtn.addEventListener('click', exportBackup);
-    el.importBtn.addEventListener('click', () => el.importFile.click());
-    el.importFile.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (file) importBackup(file);
-      e.target.value = '';
-    });
     el.refreshBtn.addEventListener('click', () => window.location.reload());
-    [el.foodName, el.calories, el.protein, el.carbs, el.fat, el.sugar, el.fiber].forEach(input => {
-      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addEntry(); });
-    });
-    refreshAll();
+    [el.foodName,el.calories,el.protein,el.carbs,el.fat,el.sugar,el.fiber].forEach(input => input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); }));
+    supabase.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
+    init();
   </script>
 </body>
 </html>
