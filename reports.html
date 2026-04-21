@@ -65,9 +65,24 @@ body.dark-mode .secondary {
   color:#f9fafb;
 }
 body.dark-mode .profile-avatar {
-  border-color: var(--border);
-  background:#111827;
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  flex: 0 0 52px !important;
 }
+.profile-select-wrap select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .dark-toggle-wrap {
   display:flex;
   align-items:center;
@@ -97,7 +112,7 @@ body.dark-mode .profile-avatar {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a href="./index.html">Tracker</a><a class="active" href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.4.2</div>
+      <div class="version">Version 4.4.3</div>
     </div>
 
     <section class="card" id="loginCard">
