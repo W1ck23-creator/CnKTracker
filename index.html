@@ -153,7 +153,7 @@
     const METRICS = ['calories','protein','carbs','fat','sugar','fiber'];
     const LAST_PROFILE_KEY = 'cnktracker-last-profile-id';
     const cfg = window.CNK_CONFIG || {};
-    const supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+    const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
     const el = {
       loginCard: document.getElementById('loginCard'),
@@ -289,7 +289,7 @@
           const idx = Number(btn.getAttribute('data-delete-index'));
           const row = currentEntries[idx];
           if (!row) return;
-          const { error } = await supabase.from('daily_entries').delete().eq('id', row.id);
+          const { error } = await supabaseClient.from('daily_entries').delete().eq('id', row.id);
           if (error) { alert(error.message); return; }
           await loadEntries();
         });
@@ -297,14 +297,14 @@
     }
 
     async function ensureProfileRows(profileId){
-      const { data: goalsRow } = await supabase.from('goals').select('*').eq('profile_id', profileId).maybeSingle();
-      if (!goalsRow) await supabase.from('goals').insert({ user_id: currentUser.id, profile_id: profileId });
-      const { data: trackingRow } = await supabase.from('tracking_options').select('*').eq('profile_id', profileId).maybeSingle();
-      if (!trackingRow) await supabase.from('tracking_options').insert({ user_id: currentUser.id, profile_id: profileId });
+      const { data: goalsRow } = await supabaseClient.from('goals').select('*').eq('profile_id', profileId).maybeSingle();
+      if (!goalsRow) await supabaseClient.from('goals').insert({ user_id: currentUser.id, profile_id: profileId });
+      const { data: trackingRow } = await supabaseClient.from('tracking_options').select('*').eq('profile_id', profileId).maybeSingle();
+      if (!trackingRow) await supabaseClient.from('tracking_options').insert({ user_id: currentUser.id, profile_id: profileId });
     }
 
     async function loadProfiles(){
-      const { data, error } = await supabase.from('profiles').select('*').order('name');
+      const { data, error } = await supabaseClient.from('profiles').select('*').order('name');
       if (error) throw error;
       profiles = data || [];
       el.profile.innerHTML = profiles.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
@@ -318,8 +318,8 @@
       if (!profileId) return;
       await ensureProfileRows(profileId);
       const [{ data: goalsRow, error: goalsError }, { data: trackingRow, error: trackingError }] = await Promise.all([
-        supabase.from('goals').select('*').eq('profile_id', profileId).single(),
-        supabase.from('tracking_options').select('*').eq('profile_id', profileId).single()
+        supabaseClient.from('goals').select('*').eq('profile_id', profileId).single(),
+        supabaseClient.from('tracking_options').select('*').eq('profile_id', profileId).single()
       ]);
       if (goalsError) throw goalsError;
       if (trackingError) throw trackingError;
@@ -332,7 +332,7 @@
     async function loadEntries(){
       const profileId = selectedProfileId();
       if (!profileId || !el.date.value) return;
-      const { data, error } = await supabase.from('daily_entries').select('*').eq('profile_id', profileId).eq('entry_date', el.date.value).order('created_at', { ascending: true });
+      const { data, error } = await supabaseClient.from('daily_entries').select('*').eq('profile_id', profileId).eq('entry_date', el.date.value).order('created_at', { ascending: true });
       if (error) throw error;
       currentEntries = data || [];
       refreshTotalsAndEntries();
@@ -356,7 +356,7 @@
         calories: Number(el.calories.value || 0), protein: Number(el.protein.value || 0), carbs: Number(el.carbs.value || 0),
         fat: Number(el.fat.value || 0), sugar: Number(el.sugar.value || 0), fiber: Number(el.fiber.value || 0)
       };
-      const { error } = await supabase.from('daily_entries').insert(payload);
+      const { error } = await supabaseClient.from('daily_entries').insert(payload);
       if (error) { alert(error.message); return; }
       ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
       el.foodName.focus();
@@ -370,7 +370,7 @@
         calories: Number(el.goalCalInput.value || 0), protein: Number(el.goalProteinInput.value || 0), carbs: Number(el.goalCarbsInput.value || 0),
         fat: Number(el.goalFatInput.value || 0), sugar: Number(el.goalSugarInput.value || 0), fiber: Number(el.goalFiberInput.value || 0)
       };
-      const { error } = await supabase.from('goals').update(payload).eq('id', currentGoals.id);
+      const { error } = await supabaseClient.from('goals').update(payload).eq('id', currentGoals.id);
       if (error) { alert(error.message); return; }
       await loadGoalsAndTracking();
       alert(`Goals saved for ${profile.name}.`);
@@ -384,7 +384,7 @@
         track_fat: el.trackFat.checked, track_sugar: el.trackSugar.checked, track_fiber: el.trackFiber.checked
       };
       if (!Object.values(payload).some(Boolean)) { alert('Please leave at least one tracking option turned on.'); return; }
-      const { error } = await supabase.from('tracking_options').update(payload).eq('id', currentTracking.id);
+      const { error } = await supabaseClient.from('tracking_options').update(payload).eq('id', currentTracking.id);
       if (error) { alert(error.message); return; }
       await loadGoalsAndTracking();
       await loadEntries();
@@ -395,7 +395,7 @@
       const profile = selectedProfile();
       if (!profile) return;
       if (!confirm(`Delete all entries for ${profile.name} on ${el.date.value}?`)) return;
-      const { error } = await supabase.from('daily_entries').delete().eq('profile_id', profile.id).eq('entry_date', el.date.value);
+      const { error } = await supabaseClient.from('daily_entries').delete().eq('profile_id', profile.id).eq('entry_date', el.date.value);
       if (error) { alert(error.message); return; }
       await loadEntries();
     }
@@ -404,7 +404,7 @@
       const email = el.email.value.trim(), password = el.password.value;
       if (!email || !password) { setStatus(el.loginStatus,'Enter your email and password first.','warning'); return; }
       el.signInBtn.disabled = true; setStatus(el.loginStatus,'Signing in...');
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       el.signInBtn.disabled = false;
       if (error) { setStatus(el.loginStatus,error.message,'warning'); return; }
       currentUser = data.user;
@@ -412,7 +412,7 @@
     }
 
     async function signOut(){
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       currentUser = null; profiles = []; currentGoals = null; currentTracking = null; currentEntries = [];
       el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden');
       setStatus(el.loginStatus,'Signed out. Sign back in whenever you want.','success');
@@ -434,7 +434,7 @@
     async function init(){
       if (!requireConfig()) return;
       el.date.value = todayString();
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData } = await supabaseClient.auth.getSession();
       currentUser = sessionData.session?.user || null;
       if (currentUser) await bootApp();
       else setStatus(el.loginStatus,'Sign in with the shared household login to load Chat and Kit.','');
@@ -450,7 +450,7 @@
     el.clearDayBtn.addEventListener('click', clearDay);
     el.refreshBtn.addEventListener('click', () => window.location.reload());
     [el.foodName,el.calories,el.protein,el.carbs,el.fat,el.sugar,el.fiber].forEach(input => input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); }));
-    supabase.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
+    supabaseClient.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
     init();
   </script>
 </body>

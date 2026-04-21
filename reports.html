@@ -100,7 +100,7 @@
     const LAST_PROFILE_KEY = 'cnktracker-last-profile-id';
     const METRICS = ['calories','protein','carbs','fat','sugar','fiber'];
     const cfg = window.CNK_CONFIG || {};
-    const supabase = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
+    const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
     const el = {
       loginCard: document.getElementById('loginCard'),
@@ -152,7 +152,7 @@
     }
 
     async function loadProfiles(){
-      const { data, error } = await supabase.from('profiles').select('*').order('name');
+      const { data, error } = await supabaseClient.from('profiles').select('*').order('name');
       if (error) throw error;
       profiles = data || [];
       el.profile.innerHTML = profiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
@@ -165,13 +165,13 @@
       const profile = selectedProfile();
       if (!profile) return;
       if (profileTracking[profile.id]) return;
-      const { data, error } = await supabase.from('tracking_options').select('*').eq('profile_id', profile.id).single();
+      const { data, error } = await supabaseClient.from('tracking_options').select('*').eq('profile_id', profile.id).single();
       if (error) throw error;
       profileTracking[profile.id] = data;
     }
 
     async function fetchEntriesForRange(profileId, startDate, endDate){
-      const { data, error } = await supabase.from('daily_entries').select('*').eq('profile_id', profileId).gte('entry_date', startDate).lte('entry_date', endDate).order('entry_date', { ascending: true }).order('created_at', { ascending: true });
+      const { data, error } = await supabaseClient.from('daily_entries').select('*').eq('profile_id', profileId).gte('entry_date', startDate).lte('entry_date', endDate).order('entry_date', { ascending: true }).order('created_at', { ascending: true });
       if (error) throw error;
       return data || [];
     }
@@ -238,7 +238,7 @@
       const email = el.email.value.trim(), password = el.password.value;
       if (!email || !password) { setStatus(el.loginStatus,'Enter your email and password first.','warning'); return; }
       el.signInBtn.disabled = true; setStatus(el.loginStatus,'Signing in...');
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       el.signInBtn.disabled = false;
       if (error) { setStatus(el.loginStatus,error.message,'warning'); return; }
       currentUser = data.user;
@@ -246,7 +246,7 @@
     }
 
     async function signOut(){
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       currentUser = null; profiles = []; profileTracking = {};
       el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden');
       setStatus(el.loginStatus,'Signed out. Sign back in whenever you want.','success');
@@ -266,7 +266,7 @@
 
     async function init(){
       if (!requireConfig()) return;
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData } = await supabaseClient.auth.getSession();
       currentUser = sessionData.session?.user || null;
       if (currentUser) await bootApp();
       else setStatus(el.loginStatus,'Sign in with the shared household login to load Chat and Kit reports.','');
@@ -278,7 +278,7 @@
     el.refreshReportBtn.addEventListener('click', refreshReport);
     el.reloadPageBtn.addEventListener('click', () => window.location.reload());
     el.signOutBtn.addEventListener('click', signOut);
-    supabase.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
+    supabaseClient.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
     init();
   </script>
 </body>
