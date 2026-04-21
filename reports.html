@@ -31,7 +31,61 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; } .actions { display:flex; gap:10px; flex-wrap:wrap; }
-    @media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr);} }
+    body.dark-mode {
+  --bg: #111827;
+  --card: #1f2937;
+  --text: #f9fafb;
+  --muted: #cbd5e1;
+  --border: #374151;
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+body.dark-mode .tile,
+body.dark-mode .status,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode table th,
+body.dark-mode table td {
+  background:#111827;
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-mode .nav a,
+body.dark-mode .version {
+  background:#1f2937;
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-mode .nav a.active {
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+body.dark-mode .secondary {
+  background:#374151;
+  color:#f9fafb;
+}
+.dark-toggle-wrap {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding-top:8px;
+}
+.toggle-switch {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.toggle-switch input[type="checkbox"] {
+  width:20px !important;
+  min-height:20px !important;
+  height:20px !important;
+  margin:0;
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+}
+
+@media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr);} }
     @media (max-width:760px){ .stats{grid-template-columns:1fr;} .field.half{grid-column:span 12;} }
   </style>
 </head>
@@ -39,7 +93,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a href="./index.html">Tracker</a><a class="active" href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.2.0</div>
+      <div class="version">Version 4.3.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -55,7 +109,7 @@
 
     <section id="appShell" class="hidden">
       <h1>Reports</h1>
-      <p class="sub">Weekly and monthly summaries based on the synced Supabase data for Chat and Kit.</p>
+      <p class="sub">Weekly and monthly summaries for Chat and Kit.</p>
 
       <div class="grid">
         <section class="card">
@@ -68,7 +122,7 @@
             <button class="secondary" id="reloadPageBtn">Refresh Page</button>
             <button id="refreshReportBtn">Refresh Report</button>
           </div>
-          <div id="sessionStatus" class="status" style="margin-top:12px;"></div>
+          <div class="dark-toggle-wrap"><div class="inline-note">Dark mode</div><label class="toggle-switch"><input type="checkbox" id="darkModeToggle" /> <span>On</span></label></div><div id="sessionStatus" class="status" style="margin-top:12px;"></div>
         </section>
 
         <section class="card">
@@ -98,6 +152,7 @@
   <script src="./config.js"></script>
   <script>
     const LAST_PROFILE_KEY = 'cnktracker-last-profile-id';
+    const DARK_MODE_KEY = 'cnktracker-dark-mode';
     const METRICS = ['calories','protein','carbs','fat','sugar','fiber'];
     const cfg = window.CNK_CONFIG || {};
     const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
@@ -110,6 +165,7 @@
       signInBtn: document.getElementById('signInBtn'),
       loginStatus: document.getElementById('loginStatus'),
       profile: document.getElementById('profile'),
+      darkModeToggle: document.getElementById('darkModeToggle'),
       period: document.getElementById('period'),
       refreshReportBtn: document.getElementById('refreshReportBtn'),
       reloadPageBtn: document.getElementById('reloadPageBtn'),
@@ -131,6 +187,8 @@
     function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
     function selectedProfileId(){ return el.profile.value||''; }
     function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
+    function setDarkMode(enabled){ document.body.classList.toggle('dark-mode', !!enabled); if (el.darkModeToggle) el.darkModeToggle.checked = !!enabled; localStorage.setItem(DARK_MODE_KEY, enabled ? '1' : '0'); }
+    function loadDarkModePreference(){ setDarkMode(localStorage.getItem(DARK_MODE_KEY) === '1'); }
 
     function requireConfig(){
       if (!cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY || cfg.SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE')) {
@@ -266,6 +324,7 @@
 
     async function init(){
       if (!requireConfig()) return;
+      loadDarkModePreference();
       const { data: sessionData } = await supabaseClient.auth.getSession();
       currentUser = sessionData.session?.user || null;
       if (currentUser) await bootApp();
@@ -277,6 +336,7 @@
     el.period.addEventListener('change', refreshReport);
     el.refreshReportBtn.addEventListener('click', refreshReport);
     el.reloadPageBtn.addEventListener('click', () => window.location.reload());
+    el.darkModeToggle.addEventListener('change', (e) => setDarkMode(e.target.checked));
     el.signOutBtn.addEventListener('click', signOut);
     supabaseClient.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
     init();
