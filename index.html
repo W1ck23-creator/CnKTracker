@@ -6,7 +6,7 @@
   <title>CnKTracker</title>
   <meta name="theme-color" content="#1f2937" />
   <style>
-    :root { --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#2563eb; --accent2:#1d4ed8; --danger:#b91c1c; --good:#065f46; --shadow:0 8px 24px rgba(0,0,0,0.08); --radius:18px; }
+    :root { --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#2563eb; --accent2:#1d4ed8; --danger:#b91c1c; --good:#16a34a; --shadow:0 8px 24px rgba(0,0,0,0.08); --radius:18px; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
     .wrap { max-width:1120px; margin:0 auto; padding:18px; }
@@ -31,6 +31,8 @@
     .tile .label { color:var(--muted); font-size:.9rem; margin-bottom:6px; font-weight:700; }
     .tile .value { font-size:1.35rem; font-weight:800; }
     .tile .goal { margin-top:4px; color:var(--good); font-size:.9rem; }
+.goal-met-value { color: var(--good) !important; }
+.goal-not-met-value { color: var(--text) !important; }
     table { width:100%; border-collapse:collapse; margin-top:8px; } th,td { text-align:left; padding:10px 8px; border-bottom:1px solid #e5e7eb; vertical-align:top; } th { color:var(--muted); font-size:.9rem; }
     .empty { color:var(--muted); padding:12px 0 4px; } .actions { display:flex; gap:10px; flex-wrap:wrap; }
     .pill { display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 8px; border-radius:999px; font-size:.85rem; font-weight:700; }
@@ -49,7 +51,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.0</div>
+      <div class="version">Version 4.1.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -65,7 +67,7 @@
 
     <section id="appShell" class="hidden">
       <h1>Macro Tracker</h1>
-      <p class="sub">Synced with Supabase, so the same data should follow you across devices after sign-in.</p>
+      <p class="sub">A simple shared tracker for Chat and Kit.</p>
 
       <div class="grid">
         <section class="card">
@@ -278,6 +280,32 @@
       el.totalFat.textContent = `${formatNum(totals.fat)}g`;
       el.totalSugar.textContent = `${formatNum(totals.sugar)}g`;
       el.totalFiber.textContent = `${formatNum(totals.fiber)}g`;
+
+      const goalPairs = [
+        ['calories', el.totalCalories],
+        ['protein', el.totalProtein],
+        ['carbs', el.totalCarbs],
+        ['fat', el.totalFat],
+        ['sugar', el.totalSugar],
+        ['fiber', el.totalFiber]
+      ];
+
+      goalPairs.forEach(([metric, node]) => {
+        const goalValue = Number(currentGoals?.[metric] || 0);
+        const totalValue = Number(totals[metric] || 0);
+        const trackingKey = metric === 'calories' ? 'track_calories' : `track_${metric}`;
+        const isTracked = currentTracking?.[trackingKey] !== false;
+
+        node.classList.remove('goal-met-value', 'goal-not-met-value');
+
+        if (!isTracked || goalValue <= 0) {
+          node.classList.add('goal-not-met-value');
+        } else if (totalValue >= goalValue) {
+          node.classList.add('goal-met-value');
+        } else {
+          node.classList.add('goal-not-met-value');
+        }
+      });
 
       if (!currentEntries.length) {
         el.entriesWrap.innerHTML = '<div class="empty">No entries yet for this day.</div>';
