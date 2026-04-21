@@ -28,13 +28,15 @@ The Project URL is already filled in.
 - tracking options
 - reports
 
-## Current Stable Version
-v4.0.1
+## Upload to GitHub Pages
+Upload these files to the repo root:
+- `index.html`
+- `reports.html`
+- `config.js`
 
-## In Progress
-feature/favorites-and-polish
+Then commit and wait for Pages to republish.
 
-### Planned for v4.1.0
-- [ ] Save favorite food option
-- [ ] Daily total colors turn green when goal is met
-- [ ] Remove "Synced with Supabase..." message
+
+## v4.1.0 (partial)
+- Removed the synced-with-Supabase tracker message
+- Daily total values stay black until goal is met, then turn green
