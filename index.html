@@ -6,7 +6,7 @@
   <title>CnKTracker</title>
   <meta name="theme-color" content="#1f2937" />
   <style>
-    :root { --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#2563eb; --accent2:#1d4ed8; --danger:#b91c1c; --good:#16a34a; --shadow:0 8px 24px rgba(0,0,0,0.08); --radius:18px; }
+    :root { --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#2563eb; --accent2:#1d4ed8; --danger:#b91c1c; --good:#065f46; --shadow:0 8px 24px rgba(0,0,0,0.08); --radius:18px; }
     * { box-sizing:border-box; }
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
     .wrap { max-width:1120px; margin:0 auto; padding:18px; }
@@ -31,8 +31,6 @@
     .tile .label { color:var(--muted); font-size:.9rem; margin-bottom:6px; font-weight:700; }
     .tile .value { font-size:1.35rem; font-weight:800; }
     .tile .goal { margin-top:4px; color:var(--good); font-size:.9rem; }
-.goal-met-value { color: var(--good) !important; }
-.goal-not-met-value { color: var(--text) !important; }
     table { width:100%; border-collapse:collapse; margin-top:8px; } th,td { text-align:left; padding:10px 8px; border-bottom:1px solid #e5e7eb; vertical-align:top; } th { color:var(--muted); font-size:.9rem; }
     .empty { color:var(--muted); padding:12px 0 4px; } .actions { display:flex; gap:10px; flex-wrap:wrap; }
     .pill { display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 8px; border-radius:999px; font-size:.85rem; font-weight:700; }
@@ -43,6 +41,54 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
+.profile-select-wrap { display:flex; align-items:center; gap:12px; }
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  flex: 0 0 auto;
+}
+.food-name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.food-name-row .food-name-main {
+  min-width: 0;
+}
+.food-name-row .food-name-fav {
+  width: 92px;
+}
+.food-name-row .food-name-fav label {
+  visibility: hidden;
+}
+.food-name-row .food-name-fav button {
+  min-height: 44px;
+}
+.favorite-row {
+  display:grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap:10px;
+  align-items:end;
+}
+.favorite-row .favorite-field {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .profile-select-wrap { align-items:flex-start; }
+  .food-name-row {
+    grid-template-columns: minmax(0, 1fr) 84px;
+    gap: 8px;
+  }
+  .food-name-row .food-name-fav {
+    width: 84px;
+  }
+}
     @media (max-width:900px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
     @media (max-width:760px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:1fr;} .field.half,.field.third,.field.quarter{grid-column:span 12;} }
   </style>
@@ -51,7 +97,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.1.0</div>
+      <div class="version">Version 4.2.1</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -67,12 +113,18 @@
 
     <section id="appShell" class="hidden">
       <h1>Macro Tracker</h1>
-      <p class="sub">A simple shared tracker for Chat and Kit.</p>
+      <p class="sub">Synced with Supabase, so the same data should follow you across devices after sign-in.</p>
 
       <div class="grid">
         <section class="card">
           <div class="row">
-            <div class="field half"><label for="profile">Profile</label><select id="profile"></select></div>
+            <div class="field half">
+              <label for="profile">Profile</label>
+              <div class="profile-select-wrap">
+                <img id="profileAvatar" class="profile-avatar" src="./images/Chatphoto.png" alt="Selected profile avatar" />
+                <select id="profile"></select>
+              </div>
+            </div>
             <div class="field half"><label for="date">Date</label><input id="date" type="date" /></div>
           </div>
           <div class="actions" style="margin-top:12px;">
@@ -86,7 +138,28 @@
           <h2>Add Food Entry</h2>
           <div class="row">
             <div class="field half"><label for="meal">Meal</label><select id="meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
-            <div class="field half"><label for="foodName">Food Name</label><input id="foodName" type="text" placeholder="Greek yogurt" /></div>
+            <div class="field half">
+              <div class="food-name-row">
+                <div class="food-name-main">
+                  <label for="foodName">Food Name</label>
+                  <input id="foodName" type="text" placeholder="Greek yogurt" />
+                </div>
+                <div class="food-name-fav">
+                  <label>&nbsp;</label>
+                  <button class="secondary" id="saveFavoriteBtn" type="button">+Fav</button>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <div class="favorite-row">
+                <div class="favorite-field">
+                  <label for="favoriteFoodSelect">Favorite Foods</label>
+                  <select id="favoriteFoodSelect">
+                    <option value="">Choose a saved favorite...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
             <div class="field quarter metric-input metric-calories"><label for="calories">Calories</label><input id="calories" type="number" min="0" step="1" placeholder="150" /></div>
             <div class="field quarter metric-input metric-protein"><label for="protein">Protein (g)</label><input id="protein" type="number" min="0" step="0.1" placeholder="15" /></div>
             <div class="field quarter metric-input metric-carbs"><label for="carbs">Carbs (g)</label><input id="carbs" type="number" min="0" step="0.1" placeholder="10" /></div>
@@ -167,7 +240,10 @@
       loginStatus: document.getElementById('loginStatus'),
       sessionStatus: document.getElementById('sessionStatus'),
       profile: document.getElementById('profile'),
+      profileAvatar: document.getElementById('profileAvatar'),
       date: document.getElementById('date'),
+      favoriteFoodSelect: document.getElementById('favoriteFoodSelect'),
+      saveFavoriteBtn: document.getElementById('saveFavoriteBtn'),
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
       calories: document.getElementById('calories'),
@@ -208,7 +284,7 @@
       refreshBtn: document.getElementById('refreshBtn')
     };
 
-    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [];
+    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [], currentFavorites = [];
 
     function todayString(){ const d=new Date(); const tz=d.getTimezoneOffset()*60000; return new Date(d-tz).toISOString().slice(0,10); }
     function formatNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1}); }
@@ -219,6 +295,89 @@
     function selectedProfileId(){ return el.profile.value||''; }
     function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
     function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
+    function getProfileAvatarPath(profileName){
+      if ((profileName || '').toLowerCase() === 'kit') return './images/Kitphoto.png';
+      return './images/Chatphoto.png';
+    }
+
+    function refreshProfileAvatar(){
+      const profile = selectedProfile();
+      el.profileAvatar.src = getProfileAvatarPath(profile?.name || 'Chat');
+      el.profileAvatar.alt = `${profile?.name || 'Selected'} avatar`;
+    }
+
+    function refreshFavoritesDropdown(){
+      const currentValue = el.favoriteFoodSelect.value;
+      const options = ['<option value="">Choose a saved favorite...</option>'].concat(
+        currentFavorites.map(f => `<option value="${f.id}">${escapeHtml(f.food_name)}</option>`)
+      );
+      el.favoriteFoodSelect.innerHTML = options.join('');
+      if (currentFavorites.some(f => f.id === currentValue)) {
+        el.favoriteFoodSelect.value = currentValue;
+      }
+    }
+
+    async function loadFavorites(){
+      const profile = selectedProfile();
+      if (!profile) return;
+      const { data, error } = await supabaseClient
+        .from('favorite_foods')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .order('food_name', { ascending: true });
+
+      if (error) throw error;
+      currentFavorites = data || [];
+      refreshFavoritesDropdown();
+    }
+
+    function applyFavoriteToForm(favoriteId){
+      const favorite = currentFavorites.find(f => f.id === favoriteId);
+      if (!favorite) return;
+      el.foodName.value = favorite.food_name || '';
+      el.calories.value = favorite.calories ?? '';
+      el.protein.value = favorite.protein ?? '';
+      el.carbs.value = favorite.carbs ?? '';
+      el.fat.value = favorite.fat ?? '';
+      el.sugar.value = favorite.sugar ?? '';
+      el.fiber.value = favorite.fiber ?? '';
+    }
+
+    async function saveCurrentAsFavorite(){
+      const profile = selectedProfile();
+      if (!profile) {
+        alert('No profile selected.');
+        return;
+      }
+
+      const foodName = el.foodName.value.trim();
+      if (!foodName) {
+        alert('Enter a food name first.');
+        el.foodName.focus();
+        return;
+      }
+
+      const payload = {
+        user_id: currentUser.id,
+        profile_id: profile.id,
+        food_name: foodName,
+        calories: Number(el.calories.value || 0),
+        protein: Number(el.protein.value || 0),
+        carbs: Number(el.carbs.value || 0),
+        fat: Number(el.fat.value || 0),
+        sugar: Number(el.sugar.value || 0),
+        fiber: Number(el.fiber.value || 0)
+      };
+
+      const { error } = await supabaseClient.from('favorite_foods').insert(payload);
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadFavorites();
+      alert(`Saved "${foodName}" as a favorite for ${profile.name}.`);
+    }
 
     function requireConfig(){
       if (!cfg.SUPABASE_URL || !cfg.SUPABASE_PUBLISHABLE_KEY || cfg.SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE')) {
@@ -281,32 +440,6 @@
       el.totalSugar.textContent = `${formatNum(totals.sugar)}g`;
       el.totalFiber.textContent = `${formatNum(totals.fiber)}g`;
 
-      const goalPairs = [
-        ['calories', el.totalCalories],
-        ['protein', el.totalProtein],
-        ['carbs', el.totalCarbs],
-        ['fat', el.totalFat],
-        ['sugar', el.totalSugar],
-        ['fiber', el.totalFiber]
-      ];
-
-      goalPairs.forEach(([metric, node]) => {
-        const goalValue = Number(currentGoals?.[metric] || 0);
-        const totalValue = Number(totals[metric] || 0);
-        const trackingKey = metric === 'calories' ? 'track_calories' : `track_${metric}`;
-        const isTracked = currentTracking?.[trackingKey] !== false;
-
-        node.classList.remove('goal-met-value', 'goal-not-met-value');
-
-        if (!isTracked || goalValue <= 0) {
-          node.classList.add('goal-not-met-value');
-        } else if (totalValue >= goalValue) {
-          node.classList.add('goal-met-value');
-        } else {
-          node.classList.add('goal-not-met-value');
-        }
-      });
-
       if (!currentEntries.length) {
         el.entriesWrap.innerHTML = '<div class="empty">No entries yet for this day.</div>';
         return;
@@ -368,7 +501,9 @@
 
     async function loadProfileData(){
       saveLastProfileId(selectedProfileId());
+      refreshProfileAvatar();
       await loadGoalsAndTracking();
+      await loadFavorites();
       await loadEntries();
       const profile = selectedProfile();
       setStatus(el.sessionStatus, `Signed in as ${currentUser.email}. Current profile: ${profile ? profile.name : 'None selected'}.`, 'success');
@@ -387,6 +522,7 @@
       const { error } = await supabaseClient.from('daily_entries').insert(payload);
       if (error) { alert(error.message); return; }
       ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
+      el.favoriteFoodSelect.value = '';
       el.foodName.focus();
       await loadEntries();
     }
@@ -472,6 +608,8 @@
     el.signOutBtn.addEventListener('click', signOut);
     el.profile.addEventListener('change', loadProfileData);
     el.date.addEventListener('change', loadEntries);
+    el.favoriteFoodSelect.addEventListener('change', (e) => applyFavoriteToForm(e.target.value));
+    el.saveFavoriteBtn.addEventListener('click', saveCurrentAsFavorite);
     el.addEntryBtn.addEventListener('click', addEntry);
     el.saveGoalsBtn.addEventListener('click', saveGoals);
     el.saveTrackingBtn.addEventListener('click', saveTrackingOptions);

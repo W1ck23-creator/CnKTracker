@@ -37,6 +37,12 @@ Upload these files to the repo root:
 Then commit and wait for Pages to republish.
 
 
-## v4.1.0 (partial)
-- Removed the synced-with-Supabase tracker message
-- Daily total values stay black until goal is met, then turn green
+## v4.2.0
+- Added profile avatars next to the profile selector
+- Added Favorite Foods dropdown
+- Added Save as Favorite button
+- Selecting a favorite now auto-fills the food entry form
+
+### Avatar image paths
+- `images/Chatphoto.png`
+- `images/Kitphoto.png`
