@@ -41,6 +41,22 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
+.macro-lookup-row {
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+}
+.macro-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.macro-link:hover {
+  text-decoration: underline;
+}
 
 body.dark-mode {
   --bg: #111827;
@@ -201,7 +217,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.3.0</div>
+      <div class="version">Version 4.4.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -251,6 +267,7 @@ body.dark-mode .icon-btn.secondary {
                 <div class="food-name-main">
                   <label for="foodName">Food Name</label>
                   <input id="foodName" type="text" placeholder="Greek yogurt" />
+                  <div class="macro-lookup-row"><a id="findMacrosLink" class="macro-link" href="https://fdc.nal.usda.gov/food-search" target="_blank" rel="noopener noreferrer">Find macros</a></div>
                 </div>
                 <div class="food-name-fav">
                   <label>&nbsp;</label>
@@ -355,6 +372,7 @@ body.dark-mode .icon-btn.secondary {
       darkModeToggle: document.getElementById('darkModeToggle'),
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
+      findMacrosLink: document.getElementById('findMacrosLink'),
       calories: document.getElementById('calories'),
       protein: document.getElementById('protein'),
       carbs: document.getElementById('carbs'),
@@ -426,6 +444,7 @@ body.dark-mode .icon-btn.secondary {
       el.fat.value = row.fat ?? '';
       el.sugar.value = row.sugar ?? '';
       el.fiber.value = row.fiber ?? '';
+      updateFindMacrosLink();
       el.addEntryBtn.textContent = 'Update Entry';
       window.scrollTo({ top: 0, behavior: 'smooth' });
       el.foodName.focus();
@@ -434,6 +453,7 @@ body.dark-mode .icon-btn.secondary {
     function resetEntryForm(){
       editingEntryId = null;
       ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
+      updateFindMacrosLink();
       el.favoriteFoodSelect.value = '';
       el.addEntryBtn.textContent = 'Add Entry';
     }
@@ -483,6 +503,7 @@ body.dark-mode .icon-btn.secondary {
       el.fat.value = favorite.fat ?? '';
       el.sugar.value = favorite.sugar ?? '';
       el.fiber.value = favorite.fiber ?? '';
+      updateFindMacrosLink();
     }
 
     async function saveCurrentAsFavorite(){
@@ -770,6 +791,7 @@ body.dark-mode .icon-btn.secondary {
       if (!requireConfig()) return;
       loadDarkModePreference();
       el.date.value = todayString();
+      updateFindMacrosLink();
       const { data: sessionData } = await supabaseClient.auth.getSession();
       currentUser = sessionData.session?.user || null;
       if (currentUser) await bootApp();
@@ -788,6 +810,7 @@ body.dark-mode .icon-btn.secondary {
     el.refreshBtn.addEventListener('click', () => window.location.reload());
     el.darkModeToggle.addEventListener('change', (e) => setDarkMode(e.target.checked));
     [el.foodName,el.calories,el.protein,el.carbs,el.fat,el.sugar,el.fiber].forEach(input => input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); }));
+    if (el.foodName && el.findMacrosLink) el.foodName.addEventListener('input', updateFindMacrosLink);
     supabaseClient.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
     init();
   </script>
