@@ -53,21 +53,32 @@
   flex: 0 0 auto;
 }
 .favorite-row {
-  display:flex;
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap:10px;
-  flex-wrap:wrap;
   align-items:end;
 }
 .favorite-row .favorite-field {
-  flex: 1 1 260px;
+  min-width: 0;
 }
 .favorite-row .favorite-button-wrap {
-  flex: 0 0 190px;
+  width: 96px;
+}
+.favorite-row .favorite-button-wrap label {
+  visibility: hidden;
+}
+.favorite-row .favorite-button-wrap button {
+  min-height: 44px;
 }
 @media (max-width: 760px) {
   .profile-select-wrap { align-items:flex-start; }
-  .favorite-row { flex-direction:column; }
-  .favorite-row .favorite-button-wrap { width:100%; flex: 1 1 auto; }
+  .favorite-row {
+    grid-template-columns: minmax(0, 1fr) 88px;
+    gap:8px;
+  }
+  .favorite-row .favorite-button-wrap {
+    width: 88px;
+  }
 }
     @media (max-width:900px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
     @media (max-width:760px){ .totals{grid-template-columns:repeat(2,1fr);} .check-grid{grid-template-columns:1fr;} .field.half,.field.third,.field.quarter{grid-column:span 12;} }
@@ -129,7 +140,7 @@
                 </div>
                 <div class="favorite-button-wrap">
                   <label>&nbsp;</label>
-                  <button class="secondary" id="saveFavoriteBtn" type="button">Save as Favorite</button>
+                  <button class="secondary" id="saveFavoriteBtn" type="button">Fav</button>
                 </div>
               </div>
             </div>
