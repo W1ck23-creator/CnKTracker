@@ -41,6 +41,22 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
+.macro-lookup-row {
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+}
+.macro-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.macro-link:hover {
+  text-decoration: underline;
+}
 
 body.dark-mode {
   --bg: #111827;
@@ -201,7 +217,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.3.0</div>
+      <div class="version">Version 4.4.2</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -251,6 +267,7 @@ body.dark-mode .icon-btn.secondary {
                 <div class="food-name-main">
                   <label for="foodName">Food Name</label>
                   <input id="foodName" type="text" placeholder="Greek yogurt" />
+                  <div class="macro-lookup-row"><a id="findMacrosLink" class="macro-link" href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener noreferrer">Find macros</a></div>
                 </div>
                 <div class="food-name-fav">
                   <label>&nbsp;</label>

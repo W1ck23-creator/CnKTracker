@@ -64,6 +64,25 @@ body.dark-mode .secondary {
   background:#374151;
   color:#f9fafb;
 }
+body.dark-mode .profile-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  flex: 0 0 52px !important;
+}
+.profile-select-wrap select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .dark-toggle-wrap {
   display:flex;
   align-items:center;
@@ -93,7 +112,7 @@ body.dark-mode .secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a href="./index.html">Tracker</a><a class="active" href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.3.0</div>
+      <div class="version">Version 4.4.3</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -114,7 +133,13 @@ body.dark-mode .secondary {
       <div class="grid">
         <section class="card">
           <div class="row">
-            <div class="field half"><label for="profile">Profile</label><select id="profile"></select></div>
+            <div class="field half">
+              <label for="profile">Profile</label>
+              <div class="profile-select-wrap">
+                <img id="profileAvatar" class="profile-avatar" src="./images/Chatphoto.png" alt="Selected profile avatar" />
+                <select id="profile"></select>
+              </div>
+            </div>
             <div class="field half"><label for="period">Report Type</label><select id="period"><option value="weekly">Last 7 Days</option><option value="monthly">Last 30 Days</option></select></div>
           </div>
           <div class="actions" style="margin-top:12px;">
@@ -165,6 +190,7 @@ body.dark-mode .secondary {
       signInBtn: document.getElementById('signInBtn'),
       loginStatus: document.getElementById('loginStatus'),
       profile: document.getElementById('profile'),
+      profileAvatar: document.getElementById('profileAvatar'),
       darkModeToggle: document.getElementById('darkModeToggle'),
       period: document.getElementById('period'),
       refreshReportBtn: document.getElementById('refreshReportBtn'),
@@ -187,6 +213,17 @@ body.dark-mode .secondary {
     function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
     function selectedProfileId(){ return el.profile.value||''; }
     function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
+    function getProfileAvatarPath(profileName){
+      if ((profileName || '').toLowerCase() === 'kit') return './images/Kitphoto.png';
+      return './images/Chatphoto.png';
+    }
+
+    function refreshProfileAvatar(){
+      const profile = selectedProfile();
+      if (!el.profileAvatar) return;
+      el.profileAvatar.src = getProfileAvatarPath(profile?.name || 'Chat');
+      el.profileAvatar.alt = `${profile?.name || 'Selected'} avatar`;
+    }
     function setDarkMode(enabled){ document.body.classList.toggle('dark-mode', !!enabled); if (el.darkModeToggle) el.darkModeToggle.checked = !!enabled; localStorage.setItem(DARK_MODE_KEY, enabled ? '1' : '0'); }
     function loadDarkModePreference(){ setDarkMode(localStorage.getItem(DARK_MODE_KEY) === '1'); }
 
@@ -217,6 +254,7 @@ body.dark-mode .secondary {
       const last = localStorage.getItem(LAST_PROFILE_KEY);
       const chosen = profiles.find(p => p.id === last) || profiles[0];
       if (chosen) { el.profile.value = chosen.id; saveLastProfileId(chosen.id); }
+      refreshProfileAvatar();
     }
 
     async function loadTracking(){
@@ -284,6 +322,7 @@ body.dark-mode .secondary {
       const profile = selectedProfile();
       if (!profile) return;
       saveLastProfileId(profile.id);
+      refreshProfileAvatar();
       await loadTracking();
       const tracking = profileTracking[profile.id];
       const days = buildDateRange(el.period.value === 'weekly' ? 7 : 30);
