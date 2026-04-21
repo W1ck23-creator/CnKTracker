@@ -41,6 +41,110 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
+
+body.dark-mode {
+  --bg: #111827;
+  --card: #1f2937;
+  --text: #f9fafb;
+  --muted: #cbd5e1;
+  --border: #374151;
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+body.dark-mode .tile,
+body.dark-mode .check-item,
+body.dark-mode .status,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode table th,
+body.dark-mode table td {
+  background:#111827;
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-mode .nav a,
+body.dark-mode .version {
+  background:#1f2937;
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-mode .nav a.active {
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+body.dark-mode .secondary {
+  background:#374151;
+  color:#f9fafb;
+}
+.dark-toggle-wrap {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding-top:8px;
+}
+.toggle-switch {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.toggle-switch input[type="checkbox"] { width:20px; min-height:20px; }
+.entries-desktop { display:block; }
+.entries-mobile { display:none; }
+.entry-card {
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:14px;
+  margin-top:10px;
+}
+.entry-card .meal {
+  font-size:0.92rem;
+  color:var(--muted);
+  font-weight:700;
+  margin-bottom:4px;
+}
+.entry-card .food {
+  font-size:1.05rem;
+  font-weight:800;
+  margin-bottom:10px;
+}
+.entry-card .macro-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 12px;
+}
+.entry-card .macro-item .macro-label {
+  color:var(--muted);
+  display:block;
+  font-size:0.82rem;
+  font-weight:700;
+}
+.entry-card .macro-item .macro-value {
+  font-weight:700;
+}
+.entry-card .actions { margin-top:12px; }
+.icon-btn {
+  width:auto;
+  min-height:38px;
+  padding:8px 12px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:10px;
+}
+body.dark-mode .entry-card {
+  background:#111827;
+  border-color:var(--border);
+}
+body.dark-mode .icon-btn.secondary {
+  background:#374151;
+  color:#f9fafb;
+}
+@media (max-width: 760px) {
+  .entries-desktop { display:none; }
+  .entries-mobile { display:block; }
+}
 .profile-select-wrap { display:flex; align-items:center; gap:12px; }
 .profile-avatar {
   width: 52px;
@@ -97,7 +201,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.2.1</div>
+      <div class="version">Version 4.3.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -130,6 +234,10 @@
           <div class="actions" style="margin-top:12px;">
             <button class="secondary" id="signOutBtn">Sign Out</button>
             <button class="secondary" id="refreshBtn">Refresh Page</button>
+          </div>
+          <div class="dark-toggle-wrap">
+            <div class="inline-note">Dark mode</div>
+            <label class="toggle-switch"><input type="checkbox" id="darkModeToggle" /> <span>On</span></label>
           </div>
           <div id="sessionStatus" class="status" style="margin-top:12px;"></div>
         </section>
@@ -185,10 +293,9 @@
         <section class="card">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
             <h2 style="margin:0;">Entries</h2>
-            <div class="actions"><button class="danger" id="clearDayBtn">Delete All for This Day</button></div>
           </div>
           <div id="entriesWrap"></div>
-          <div class="footer-note">This version reads and writes entries directly from Supabase instead of local-only browser storage.</div>
+          
         </section>
 
         <section class="card">
@@ -227,6 +334,7 @@
   <script>
     const METRICS = ['calories','protein','carbs','fat','sugar','fiber'];
     const LAST_PROFILE_KEY = 'cnktracker-last-profile-id';
+    const DARK_MODE_KEY = 'cnktracker-dark-mode';
     const cfg = window.CNK_CONFIG || {};
     const supabaseClient = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY);
 
@@ -244,6 +352,7 @@
       date: document.getElementById('date'),
       favoriteFoodSelect: document.getElementById('favoriteFoodSelect'),
       saveFavoriteBtn: document.getElementById('saveFavoriteBtn'),
+      darkModeToggle: document.getElementById('darkModeToggle'),
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
       calories: document.getElementById('calories'),
@@ -280,11 +389,10 @@
       trackFiber: document.getElementById('trackFiber'),
       saveTrackingBtn: document.getElementById('saveTrackingBtn'),
       entriesWrap: document.getElementById('entriesWrap'),
-      clearDayBtn: document.getElementById('clearDayBtn'),
       refreshBtn: document.getElementById('refreshBtn')
     };
 
-    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [], currentFavorites = [];
+    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [], currentFavorites = [], editingEntryId = null;
 
     function todayString(){ const d=new Date(); const tz=d.getTimezoneOffset()*60000; return new Date(d-tz).toISOString().slice(0,10); }
     function formatNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1}); }
@@ -295,6 +403,40 @@
     function selectedProfileId(){ return el.profile.value||''; }
     function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
     function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
+
+    function setDarkMode(enabled){
+      document.body.classList.toggle('dark-mode', !!enabled);
+      if (el.darkModeToggle) el.darkModeToggle.checked = !!enabled;
+      localStorage.setItem(DARK_MODE_KEY, enabled ? '1' : '0');
+    }
+
+    function loadDarkModePreference(){
+      setDarkMode(localStorage.getItem(DARK_MODE_KEY) === '1');
+    }
+
+    function beginEditEntry(entryId){
+      const row = currentEntries.find(item => item.id === entryId);
+      if (!row) return;
+      editingEntryId = entryId;
+      el.meal.value = row.meal || 'Breakfast';
+      el.foodName.value = row.food_name || '';
+      el.calories.value = row.calories ?? '';
+      el.protein.value = row.protein ?? '';
+      el.carbs.value = row.carbs ?? '';
+      el.fat.value = row.fat ?? '';
+      el.sugar.value = row.sugar ?? '';
+      el.fiber.value = row.fiber ?? '';
+      el.addEntryBtn.textContent = 'Update Entry';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      el.foodName.focus();
+    }
+
+    function resetEntryForm(){
+      editingEntryId = null;
+      ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
+      el.favoriteFoodSelect.value = '';
+      el.addEntryBtn.textContent = 'Add Entry';
+    }
     function getProfileAvatarPath(profileName){
       if ((profileName || '').toLowerCase() === 'kit') return './images/Kitphoto.png';
       return './images/Chatphoto.png';
@@ -421,11 +563,39 @@
     function buildEntriesTable(entries){
       const tracked = METRICS.filter(m => currentTracking?.['track_'+m] !== false);
       const headerCells = ['Meal','Food'].concat(tracked.map(metricLabel)).concat(['']);
-      const rows = entries.map((item, index) => {
+      const rows = entries.map((item) => {
         const valueCells = tracked.map(m => `<td>${formatNum(item[m]||0)}${metricSuffix(m)}</td>`).join('');
-        return `<tr><td>${item.meal}</td><td>${escapeHtml(item.food_name)}</td>${valueCells}<td><button class="danger small" data-delete-index="${index}">Delete</button></td></tr>`;
+        return `<tr>
+          <td>${item.meal}</td>
+          <td>${escapeHtml(item.food_name)}</td>
+          ${valueCells}
+          <td>
+            <div class="actions">
+              <button class="secondary small icon-btn" data-edit-id="${item.id}" title="Edit">✏️</button>
+              <button class="danger small icon-btn" data-delete-id="${item.id}" title="Delete">❌</button>
+            </div>
+          </td>
+        </tr>`;
       }).join('');
-      return `<table><thead><tr>${headerCells.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+      const tableHtml = `<div class="entries-desktop"><table><thead><tr>${headerCells.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+
+      const mobileCards = entries.map((item) => {
+        const macroHtml = tracked.map(m => `
+          <div class="macro-item">
+            <span class="macro-label">${metricLabel(m)}</span>
+            <span class="macro-value">${formatNum(item[m]||0)}${metricSuffix(m)}</span>
+          </div>`).join('');
+        return `<div class="entry-card">
+          <div class="meal">${item.meal}</div>
+          <div class="food">${escapeHtml(item.food_name)}</div>
+          <div class="macro-grid">${macroHtml}</div>
+          <div class="actions">
+            <button class="secondary icon-btn" data-edit-id="${item.id}" title="Edit">✏️ Edit</button>
+            <button class="danger icon-btn" data-delete-id="${item.id}" title="Delete">❌</button>
+          </div>
+        </div>`;
+      }).join('');
+      return tableHtml + `<div class="entries-mobile">${mobileCards}</div>`;
     }
 
     function refreshTotalsAndEntries(){
@@ -445,15 +615,18 @@
         return;
       }
       el.entriesWrap.innerHTML = buildEntriesTable(currentEntries);
-      el.entriesWrap.querySelectorAll('[data-delete-index]').forEach(btn => {
+      el.entriesWrap.querySelectorAll('[data-delete-id]').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const idx = Number(btn.getAttribute('data-delete-index'));
-          const row = currentEntries[idx];
-          if (!row) return;
-          const { error } = await supabaseClient.from('daily_entries').delete().eq('id', row.id);
+          const rowId = btn.getAttribute('data-delete-id');
+          if (!rowId) return;
+          const { error } = await supabaseClient.from('daily_entries').delete().eq('id', rowId);
           if (error) { alert(error.message); return; }
+          if (editingEntryId === rowId) resetEntryForm();
           await loadEntries();
         });
+      });
+      el.entriesWrap.querySelectorAll('[data-edit-id]').forEach(btn => {
+        btn.addEventListener('click', () => beginEditEntry(btn.getAttribute('data-edit-id')));
       });
     }
 
@@ -519,10 +692,16 @@
         calories: Number(el.calories.value || 0), protein: Number(el.protein.value || 0), carbs: Number(el.carbs.value || 0),
         fat: Number(el.fat.value || 0), sugar: Number(el.sugar.value || 0), fiber: Number(el.fiber.value || 0)
       };
-      const { error } = await supabaseClient.from('daily_entries').insert(payload);
+
+      let error = null;
+      if (editingEntryId) {
+        ({ error } = await supabaseClient.from('daily_entries').update(payload).eq('id', editingEntryId));
+      } else {
+        ({ error } = await supabaseClient.from('daily_entries').insert(payload));
+      }
       if (error) { alert(error.message); return; }
-      ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
-      el.favoriteFoodSelect.value = '';
+
+      resetEntryForm();
       el.foodName.focus();
       await loadEntries();
     }
@@ -555,14 +734,6 @@
       alert(`Tracking options saved for ${profile.name}.`);
     }
 
-    async function clearDay(){
-      const profile = selectedProfile();
-      if (!profile) return;
-      if (!confirm(`Delete all entries for ${profile.name} on ${el.date.value}?`)) return;
-      const { error } = await supabaseClient.from('daily_entries').delete().eq('profile_id', profile.id).eq('entry_date', el.date.value);
-      if (error) { alert(error.message); return; }
-      await loadEntries();
-    }
 
     async function signIn(){
       const email = el.email.value.trim(), password = el.password.value;
@@ -597,6 +768,7 @@
 
     async function init(){
       if (!requireConfig()) return;
+      loadDarkModePreference();
       el.date.value = todayString();
       const { data: sessionData } = await supabaseClient.auth.getSession();
       currentUser = sessionData.session?.user || null;
@@ -613,8 +785,8 @@
     el.addEntryBtn.addEventListener('click', addEntry);
     el.saveGoalsBtn.addEventListener('click', saveGoals);
     el.saveTrackingBtn.addEventListener('click', saveTrackingOptions);
-    el.clearDayBtn.addEventListener('click', clearDay);
     el.refreshBtn.addEventListener('click', () => window.location.reload());
+    el.darkModeToggle.addEventListener('change', (e) => setDarkMode(e.target.checked));
     [el.foodName,el.calories,el.protein,el.carbs,el.fat,el.sugar,el.fiber].forEach(input => input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); }));
     supabaseClient.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; if (!currentUser) { el.appShell.classList.add('hidden'); el.loginCard.classList.remove('hidden'); } });
     init();

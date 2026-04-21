@@ -1,48 +1,10 @@
-# CnKTracker v4.0 (Supabase-backed)
-
-This version switches the tracker from local-only browser storage to Supabase-backed syncing.
-
-## Files
-- `index.html` = synced tracker
-- `reports.html` = synced reports
-- `config.js` = Supabase URL + publishable key
-- `README.md` = setup notes
-
-## Important before upload
-Open `config.js` and replace:
-
-`PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE`
-
-with your real Supabase publishable key.
-
-The Project URL is already filled in.
-
-## App flow
-- One household login
-- Two profiles inside the app: Chat and Kit
-- The app remembers the last profile used on each device/browser
-
-## What this version syncs
-- daily entries
-- goals
-- tracking options
-- reports
-
-## Upload to GitHub Pages
-Upload these files to the repo root:
-- `index.html`
-- `reports.html`
-- `config.js`
-
-Then commit and wait for Pages to republish.
+# CnKTracker
 
 
-## v4.2.0
-- Added profile avatars next to the profile selector
-- Added Favorite Foods dropdown
-- Added Save as Favorite button
-- Selecting a favorite now auto-fills the food entry form
-
-### Avatar image paths
-- `images/Chatphoto.png`
-- `images/Kitphoto.png`
+## v4.3.0
+- Added edit option for entries
+- Replaced delete text with icon-style actions
+- Removed Delete All for This Day
+- Removed Supabase note in Entries section
+- Entries now use a mobile-friendly card layout on phones and a table on desktop
+- Added dark mode toggle for tracker and reports
