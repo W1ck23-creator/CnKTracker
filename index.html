@@ -42,6 +42,52 @@
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
 
+.favorite-field {
+  position: relative;
+}
+.favorite-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  max-height: 220px;
+  overflow-y: auto;
+}
+.favorite-result-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.96rem;
+}
+.favorite-result-item:last-child {
+  border-bottom: none;
+}
+.favorite-result-item:hover,
+.favorite-result-item.active {
+  background: #f3f4f6;
+}
+.favorite-empty {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+body.dark-mode .favorite-results {
+  background: #111827;
+  border-color: var(--border);
+}
+body.dark-mode .favorite-result-item {
+  border-bottom-color: var(--border);
+}
+body.dark-mode .favorite-result-item:hover,
+body.dark-mode .favorite-result-item.active {
+  background: #1f2937;
+}
+
 .streak-card {
   grid-column: span 12;
 }
@@ -248,7 +294,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 5.0.0</div>
+      <div class="version">Version 5.1.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -321,10 +367,9 @@ body.dark-mode .icon-btn.secondary {
             <div class="field">
               <div class="favorite-row">
                 <div class="favorite-field">
-                  <label for="favoriteFoodSelect">Favorite Foods</label>
-                  <select id="favoriteFoodSelect">
-                    <option value="">Choose a saved favorite...</option>
-                  </select>
+                  <label for="favoriteFoodSearch">Favorite Foods</label>
+                  <input id="favoriteFoodSearch" type="text" placeholder="Search favorites..." autocomplete="off" />
+                  <div id="favoriteResults" class="favorite-results hidden"></div>
                 </div>
               </div>
             </div>
@@ -412,7 +457,8 @@ body.dark-mode .icon-btn.secondary {
       profile: document.getElementById('profile'),
       profileAvatar: document.getElementById('profileAvatar'),
       date: document.getElementById('date'),
-      favoriteFoodSelect: document.getElementById('favoriteFoodSelect'),
+      favoriteFoodSearch: document.getElementById('favoriteFoodSearch'),
+      favoriteResults: document.getElementById('favoriteResults'),
       saveFavoriteBtn: document.getElementById('saveFavoriteBtn'),
       darkModeToggle: document.getElementById('darkModeToggle'),
       meal: document.getElementById('meal'),
@@ -454,7 +500,7 @@ body.dark-mode .icon-btn.secondary {
       refreshBtn: document.getElementById('refreshBtn')
     };
 
-    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [], currentFavorites = [], editingEntryId = null;
+    let currentUser = null, profiles = [], currentGoals = null, currentTracking = null, currentEntries = [], currentFavorites = [], editingEntryId = null, filteredFavorites = [], favoriteActiveIndex = -1;
 
     function todayString(){ const d=new Date(); const tz=d.getTimezoneOffset()*60000; return new Date(d-tz).toISOString().slice(0,10); }
     function formatNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1}); }
@@ -556,7 +602,8 @@ body.dark-mode .icon-btn.secondary {
     function resetEntryForm(){
       editingEntryId = null;
       ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
-      el.favoriteFoodSelect.value = '';
+      if (el.favoriteFoodSearch) el.favoriteFoodSearch.value = '';
+      closeFavoriteResults();
       el.addEntryBtn.textContent = 'Add Entry';
     }
     function getProfileAvatarPath(profileName){
@@ -570,15 +617,54 @@ body.dark-mode .icon-btn.secondary {
       el.profileAvatar.alt = `${profile?.name || 'Selected'} avatar`;
     }
 
-    function refreshFavoritesDropdown(){
-      const currentValue = el.favoriteFoodSelect.value;
-      const options = ['<option value="">Choose a saved favorite...</option>'].concat(
-        currentFavorites.map(f => `<option value="${f.id}">${escapeHtml(f.food_name)}</option>`)
+    function refreshFavoriteResults(){
+      if (!el.favoriteResults) return;
+      const query = (el.favoriteFoodSearch?.value || '').trim().toLowerCase();
+
+      filteredFavorites = currentFavorites.filter(f =>
+        !query || (f.food_name || '').toLowerCase().includes(query)
       );
-      el.favoriteFoodSelect.innerHTML = options.join('');
-      if (currentFavorites.some(f => f.id === currentValue)) {
-        el.favoriteFoodSelect.value = currentValue;
+
+      favoriteActiveIndex = filteredFavorites.length ? 0 : -1;
+
+      if (!query) {
+        closeFavoriteResults();
+        return;
       }
+
+      if (!filteredFavorites.length) {
+        el.favoriteResults.innerHTML = '<div class="favorite-empty">No matching favorites</div>';
+        el.favoriteResults.classList.remove('hidden');
+        return;
+      }
+
+      el.favoriteResults.innerHTML = filteredFavorites.map((f, idx) =>
+        `<div class="favorite-result-item${idx === favoriteActiveIndex ? ' active' : ''}" data-favorite-id="${f.id}">${escapeHtml(f.food_name)}</div>`
+      ).join('');
+
+      el.favoriteResults.classList.remove('hidden');
+
+      el.favoriteResults.querySelectorAll('[data-favorite-id]').forEach(node => {
+        node.addEventListener('click', () => {
+          applyFavoriteToForm(node.getAttribute('data-favorite-id'));
+          closeFavoriteResults();
+        });
+      });
+    }
+
+    function closeFavoriteResults(){
+      if (!el.favoriteResults) return;
+      el.favoriteResults.classList.add('hidden');
+      el.favoriteResults.innerHTML = '';
+      favoriteActiveIndex = -1;
+    }
+
+    function syncFavoriteActiveItem(){
+      if (!el.favoriteResults) return;
+      const items = [...el.favoriteResults.querySelectorAll('.favorite-result-item')];
+      items.forEach((item, idx) => item.classList.toggle('active', idx === favoriteActiveIndex));
+      const active = items[favoriteActiveIndex];
+      if (active) active.scrollIntoView({ block: 'nearest' });
     }
 
     async function loadFavorites(){
@@ -592,12 +678,14 @@ body.dark-mode .icon-btn.secondary {
 
       if (error) throw error;
       currentFavorites = data || [];
-      refreshFavoritesDropdown();
+      closeFavoriteResults();
+      if (el.favoriteFoodSearch) el.favoriteFoodSearch.value = '';
     }
 
     function applyFavoriteToForm(favoriteId){
       const favorite = currentFavorites.find(f => f.id === favoriteId);
       if (!favorite) return;
+      if (el.favoriteFoodSearch) el.favoriteFoodSearch.value = favorite.food_name || '';
       el.foodName.value = favorite.food_name || '';
       el.calories.value = favorite.calories ?? '';
       el.protein.value = favorite.protein ?? '';
@@ -903,7 +991,44 @@ body.dark-mode .icon-btn.secondary {
     el.signOutBtn.addEventListener('click', signOut);
     el.profile.addEventListener('change', loadProfileData);
     el.date.addEventListener('change', loadEntries);
-    el.favoriteFoodSelect.addEventListener('change', (e) => applyFavoriteToForm(e.target.value));
+    if (el.favoriteFoodSearch) {
+      el.favoriteFoodSearch.addEventListener('input', refreshFavoriteResults);
+      el.favoriteFoodSearch.addEventListener('focus', () => {
+        if ((el.favoriteFoodSearch.value || '').trim()) refreshFavoriteResults();
+      });
+      el.favoriteFoodSearch.addEventListener('keydown', (e) => {
+        if (el.favoriteResults?.classList.contains('hidden')) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (filteredFavorites.length) {
+            favoriteActiveIndex = Math.min(filteredFavorites.length - 1, favoriteActiveIndex + 1);
+            syncFavoriteActiveItem();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (filteredFavorites.length) {
+            favoriteActiveIndex = Math.max(0, favoriteActiveIndex - 1);
+            syncFavoriteActiveItem();
+          }
+        } else if (e.key === 'Enter') {
+          if (filteredFavorites.length && favoriteActiveIndex >= 0) {
+            e.preventDefault();
+            applyFavoriteToForm(filteredFavorites[favoriteActiveIndex].id);
+            closeFavoriteResults();
+          }
+        } else if (e.key === 'Escape') {
+          closeFavoriteResults();
+        }
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const favoriteField = document.querySelector('.favorite-field');
+      if (favoriteField && !favoriteField.contains(e.target)) {
+        closeFavoriteResults();
+      }
+    });
     el.saveFavoriteBtn.addEventListener('click', saveCurrentAsFavorite);
     el.addEntryBtn.addEventListener('click', addEntry);
     el.saveGoalsBtn.addEventListener('click', saveGoals);

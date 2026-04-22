@@ -43,3 +43,9 @@ Then commit and wait for Pages to republish.
 - Uses forgiving streak logic:
   - a day counts with at least one entry
   - streak stays alive if the most recent logged day is today or yesterday
+
+
+## v5.1.0
+- Replaced plain Favorite Foods dropdown with a searchable autocomplete-style favorites field
+- Type to filter favorites by any part of the food name
+- Click or keyboard-select a favorite to autofill the entry form
