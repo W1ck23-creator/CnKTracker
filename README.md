@@ -1,24 +1,45 @@
-# CnKTracker
+# CnKTracker v4.0 (Supabase-backed)
+
+This version switches the tracker from local-only browser storage to Supabase-backed syncing.
+
+## Files
+- `index.html` = synced tracker
+- `reports.html` = synced reports
+- `config.js` = Supabase URL + publishable key
+- `README.md` = setup notes
+
+## Important before upload
+Open `config.js` and replace:
+
+`PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE`
+
+with your real Supabase publishable key.
+
+The Project URL is already filled in.
+
+## App flow
+- One household login
+- Two profiles inside the app: Chat and Kit
+- The app remembers the last profile used on each device/browser
+
+## What this version syncs
+- daily entries
+- goals
+- tracking options
+- reports
+
+## Upload to GitHub Pages
+Upload these files to the repo root:
+- `index.html`
+- `reports.html`
+- `config.js`
+
+Then commit and wait for Pages to republish.
 
 
-## v4.3.0
-- Added edit option for entries
-- Replaced delete text with icon-style actions
-- Removed Delete All for This Day
-- Removed Supabase note in Entries section
-- Entries now use a mobile-friendly card layout on phones and a table on desktop
-- Added dark mode toggle for tracker and reports
-
-
-## v4.4.0
-- Added USDA FoodData Central “Find macros” link in Tracker
-- Added profile avatar to Reports in the same position as Tracker
-
-### Note
-- USDA FoodData Central opens directly from the app, but the site does not reliably honor a prefilled search term from the link.
-
-
-## v4.4.2
-- Updated Find macros to open the USDA FoodData Central homepage
-- Fixed Reports avatar styling so it matches the small profile avatar on Tracker
-- Kept Reports based on the last known-good non-blank file
+## v5.0.0
+- Added minimal current streak and longest streak display to Tracker
+- Added current streak and longest streak to Reports summary
+- Uses forgiving streak logic:
+  - a day counts with at least one entry
+  - streak stays alive if the most recent logged day is today or yesterday

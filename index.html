@@ -41,21 +41,52 @@
     .status { padding:10px 12px; border-radius:12px; background:#f9fafb; border:1px solid #e5e7eb; color:var(--muted); }
     .warning { background:#fff7ed; border-color:#fdba74; color:#9a3412; } .success { background:#ecfdf5; border-color:#86efac; color:#166534; }
     .hidden { display:none !important; }
-.macro-lookup-row {
-  display:flex;
-  justify-content:flex-start;
-  align-items:center;
-  gap:8px;
-  margin-top:6px;
+
+.streak-card {
+  grid-column: span 12;
 }
-.macro-link {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.92rem;
-  font-weight: 700;
+.streak-mini-grid {
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:10px;
 }
-.macro-link:hover {
-  text-decoration: underline;
+.streak-mini {
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:10px 12px;
+}
+.streak-mini-label {
+  color:var(--muted);
+  font-size:0.8rem;
+  font-weight:700;
+  margin-bottom:2px;
+}
+.streak-mini-value {
+  font-size:1.05rem;
+  font-weight:800;
+  line-height:1.1;
+}
+.streak-mini-suffix {
+  font-size:0.8rem;
+  color:var(--muted);
+  margin-left:4px;
+}
+body.dark-mode .streak-mini {
+  background:#111827;
+  border-color:var(--border);
+}
+@media (max-width: 760px) {
+  .streak-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:8px;
+  }
+  .streak-mini {
+    padding:9px 10px;
+  }
+  .streak-mini-value {
+    font-size:1rem;
+  }
 }
 
 body.dark-mode {
@@ -217,7 +248,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 4.4.2</div>
+      <div class="version">Version 5.0.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -258,6 +289,19 @@ body.dark-mode .icon-btn.secondary {
           <div id="sessionStatus" class="status" style="margin-top:12px;"></div>
         </section>
 
+        <section class="card streak-card">
+          <div class="streak-mini-grid">
+            <div class="streak-mini">
+              <div class="streak-mini-label">Current streak</div>
+              <div class="streak-mini-value"><span id="currentStreakValue">0</span><span class="streak-mini-suffix">days</span></div>
+            </div>
+            <div class="streak-mini">
+              <div class="streak-mini-label">Longest streak</div>
+              <div class="streak-mini-value"><span id="longestStreakValue">0</span><span class="streak-mini-suffix">days</span></div>
+            </div>
+          </div>
+        </section>
+
         <section class="card">
           <h2>Add Food Entry</h2>
           <div class="row">
@@ -267,7 +311,6 @@ body.dark-mode .icon-btn.secondary {
                 <div class="food-name-main">
                   <label for="foodName">Food Name</label>
                   <input id="foodName" type="text" placeholder="Greek yogurt" />
-                  <div class="macro-lookup-row"><a id="findMacrosLink" class="macro-link" href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener noreferrer">Find macros</a></div>
                 </div>
                 <div class="food-name-fav">
                   <label>&nbsp;</label>
@@ -364,6 +407,8 @@ body.dark-mode .icon-btn.secondary {
       signOutBtn: document.getElementById('signOutBtn'),
       loginStatus: document.getElementById('loginStatus'),
       sessionStatus: document.getElementById('sessionStatus'),
+      currentStreakValue: document.getElementById('currentStreakValue'),
+      longestStreakValue: document.getElementById('longestStreakValue'),
       profile: document.getElementById('profile'),
       profileAvatar: document.getElementById('profileAvatar'),
       date: document.getElementById('date'),
@@ -419,6 +464,66 @@ body.dark-mode .icon-btn.secondary {
     function escapeHtml(str){ return String(str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
     function selectedProfileId(){ return el.profile.value||''; }
     function selectedProfile(){ return profiles.find(p=>p.id===selectedProfileId())||null; }
+
+    function toDateOnlyString(dateObj){
+      const d = new Date(dateObj);
+      const tz = d.getTimezoneOffset() * 60000;
+      return new Date(d - tz).toISOString().slice(0, 10);
+    }
+
+    function daysBetween(aStr, bStr){
+      const a = new Date(aStr + 'T00:00:00');
+      const b = new Date(bStr + 'T00:00:00');
+      return Math.round((b - a) / 86400000);
+    }
+
+    function calculateStreaksFromDates(dateStrings){
+      const uniqueSorted = [...new Set((dateStrings || []).filter(Boolean))].sort();
+      if (!uniqueSorted.length) return { current: 0, longest: 0 };
+
+      let longest = 1;
+      let run = 1;
+      for (let i = 1; i < uniqueSorted.length; i++) {
+        if (daysBetween(uniqueSorted[i - 1], uniqueSorted[i]) === 1) {
+          run += 1;
+          if (run > longest) longest = run;
+        } else {
+          run = 1;
+        }
+      }
+
+      const today = toDateOnlyString(new Date());
+      const yesterday = toDateOnlyString(new Date(Date.now() - 86400000));
+      const lastLogged = uniqueSorted[uniqueSorted.length - 1];
+
+      let current = 0;
+      if (lastLogged === today || lastLogged === yesterday) {
+        current = 1;
+        for (let i = uniqueSorted.length - 1; i > 0; i--) {
+          if (daysBetween(uniqueSorted[i - 1], uniqueSorted[i]) === 1) current += 1;
+          else break;
+        }
+      }
+
+      return { current, longest };
+    }
+
+    async function loadStreaks(){
+      const profile = selectedProfile();
+      if (!profile) return;
+
+      const { data, error } = await supabaseClient
+        .from('daily_entries')
+        .select('entry_date')
+        .eq('profile_id', profile.id)
+        .order('entry_date', { ascending: true });
+
+      if (error) throw error;
+
+      const streaks = calculateStreaksFromDates((data || []).map(row => row.entry_date));
+      if (el.currentStreakValue) el.currentStreakValue.textContent = String(streaks.current);
+      if (el.longestStreakValue) el.longestStreakValue.textContent = String(streaks.longest);
+    }
     function saveLastProfileId(id){ if(id) localStorage.setItem(LAST_PROFILE_KEY,id); }
 
     function setDarkMode(enabled){
@@ -694,6 +799,7 @@ body.dark-mode .icon-btn.secondary {
       refreshProfileAvatar();
       await loadGoalsAndTracking();
       await loadFavorites();
+      await loadStreaks();
       await loadEntries();
       const profile = selectedProfile();
       setStatus(el.sessionStatus, `Signed in as ${currentUser.email}. Current profile: ${profile ? profile.name : 'None selected'}.`, 'success');
