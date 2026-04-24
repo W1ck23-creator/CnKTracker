@@ -15,6 +15,9 @@
     .nav a { text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; font-weight:700; }
     .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
     .version { color:var(--muted); font-size:.9rem; font-weight:700; background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; }
+    .topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .top-streak-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border); border-radius:999px; padding:8px 12px; font-weight:700; font-size:.9rem; line-height:1; }
+    .top-streak-bolt { font-size:1rem; }
     h1 { margin:0 0 6px; font-size:1.9rem; } h2 { margin:0 0 12px; } .sub { margin:0 0 18px; color:var(--muted); }
     .grid { display:grid; gap:16px; grid-template-columns:repeat(12,1fr); }
     .card { grid-column:span 12; background:var(--card); border:1px solid rgba(0,0,0,0.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; }
@@ -294,7 +297,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 5.2.0</div>
+      <div class="topbar-right"><div class="top-streak-chip" title="Current streak"><span class="top-streak-bolt">⚡</span><span id="currentStreakValue">0</span></div><div class="version">Version 6.0.0</div></div>
     </div>
 
     <section class="card" id="loginCard">
@@ -335,18 +338,6 @@ body.dark-mode .icon-btn.secondary {
           <div id="sessionStatus" class="status" style="margin-top:12px;"></div>
         </section>
 
-        <section class="card streak-card">
-          <div class="streak-mini-grid">
-            <div class="streak-mini">
-              <div class="streak-mini-label">Current streak</div>
-              <div class="streak-mini-value"><span id="currentStreakValue">0</span><span class="streak-mini-suffix">days</span></div>
-            </div>
-            <div class="streak-mini">
-              <div class="streak-mini-label">Longest streak</div>
-              <div class="streak-mini-value"><span id="longestStreakValue">0</span><span class="streak-mini-suffix">days</span></div>
-            </div>
-          </div>
-        </section>
 
         <section class="card">
           <h2>Add Food Entry</h2>
@@ -454,7 +445,6 @@ body.dark-mode .icon-btn.secondary {
       loginStatus: document.getElementById('loginStatus'),
       sessionStatus: document.getElementById('sessionStatus'),
       currentStreakValue: document.getElementById('currentStreakValue'),
-      longestStreakValue: document.getElementById('longestStreakValue'),
       profile: document.getElementById('profile'),
       profileAvatar: document.getElementById('profileAvatar'),
       date: document.getElementById('date'),

@@ -15,6 +15,11 @@
     .nav a { text-decoration:none; color:var(--text); background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; font-weight:700; }
     .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
     .version { color:var(--muted); font-size:.9rem; font-weight:700; background:#fff; border:1px solid var(--border); padding:10px 14px; border-radius:999px; }
+    .profile-report-wrap { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .profile-report-main { display:flex; align-items:center; gap:12px; flex:0 0 auto; }
+    .profile-badges { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .badge-icon { width:28px; height:28px; max-width:28px; max-height:28px; object-fit:contain; display:inline-block; }
+    .badge-empty { color:var(--muted); font-size:.9rem; }
     h1 { margin:0 0 6px; font-size:1.9rem; } h2 { margin:0 0 12px; } .sub { margin:0 0 18px; color:var(--muted); }
     .grid { display:grid; gap:16px; grid-template-columns:repeat(12,1fr); }
     .card { grid-column:span 12; background:var(--card); border:1px solid rgba(0,0,0,0.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; }
@@ -93,7 +98,7 @@ body.dark-mode .secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a href="./index.html">Tracker</a><a class="active" href="./reports.html">Reports</a></div>
-      <div class="version">Version 5.0.2</div>
+      <div class="version">Version 6.0.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -116,9 +121,12 @@ body.dark-mode .secondary {
           <div class="row">
             <div class="field half">
               <label for="profile">Profile</label>
-              <div class="profile-select-wrap">
-                <img id="profileAvatar" class="profile-avatar" src="./images/Chatphoto.png" alt="Selected profile avatar" width="52" height="52" style="width:52px;height:52px;min-width:52px;min-height:52px;max-width:52px;max-height:52px;border-radius:50%;object-fit:cover;display:block;flex:0 0 52px;" />
-                <select id="profile"></select>
+              <div class="profile-report-wrap">
+                <div class="profile-report-main">
+                  <img id="profileAvatar" class="profile-avatar" src="./images/Chatphoto.png" alt="Selected profile avatar" width="52" height="52" style="width:52px;height:52px;min-width:52px;min-height:52px;max-width:52px;max-height:52px;border-radius:50%;object-fit:cover;display:block;flex:0 0 52px;" />
+                  <select id="profile"></select>
+                </div>
+                <div id="profileBadges" class="profile-badges" aria-label="Earned badges"></div>
               </div>
             </div>
             <div class="field half"><label for="period">Report Type</label><select id="period"><option value="weekly">Last 7 Days</option><option value="monthly">Last 30 Days</option></select></div>
@@ -174,6 +182,7 @@ body.dark-mode .secondary {
       loginStatus: document.getElementById('loginStatus'),
       profile: document.getElementById('profile'),
       profileAvatar: document.getElementById('profileAvatar'),
+      profileBadges: document.getElementById('profileBadges'),
       darkModeToggle: document.getElementById('darkModeToggle'),
       period: document.getElementById('period'),
       refreshReportBtn: document.getElementById('refreshReportBtn'),
@@ -208,6 +217,33 @@ body.dark-mode .secondary {
       if (!el.profileAvatar) return;
       el.profileAvatar.src = getProfileAvatarPath(profile?.name || 'Chat');
       el.profileAvatar.alt = `${profile?.name || 'Selected'} avatar`;
+    }
+
+    const BADGE_DEFS = [
+      { threshold: 10, src: './images/cnktracker_heart_badge_10_128.png', alt: '10 day badge' },
+      { threshold: 25, src: './images/cnktracker_heart_badge_25_128.png', alt: '25 day badge' },
+      { threshold: 50, src: './images/cnktracker_heart_badge_50_128.png', alt: '50 day badge' },
+      { threshold: 100, src: './images/cnktracker_heart_badge_100_128.png', alt: '100 day badge' },
+      { threshold: 365, src: './images/cnktracker_heart_badge_365_128.png', alt: '365 day badge' }
+    ];
+
+    function renderBadges(totalLoggedDays){
+      if (!el.profileBadges) return;
+      const earned = BADGE_DEFS.filter(b => totalLoggedDays >= b.threshold);
+      if (!earned.length) {
+        el.profileBadges.innerHTML = '<span class="badge-empty">No badges yet</span>';
+        return;
+      }
+      el.profileBadges.innerHTML = earned.map(b => `<img class="badge-icon" src="${b.src}" alt="${b.alt}" title="${b.threshold} logged days" />`).join('');
+    }
+
+    async function loadBadges(){
+      const profile = selectedProfile();
+      if (!profile) return;
+      const { data, error } = await supabaseClient.from('daily_entries').select('entry_date').eq('profile_id', profile.id).order('entry_date', { ascending: true });
+      if (error) throw error;
+      const uniqueDays = [...new Set((data || []).map(row => row.entry_date).filter(Boolean))];
+      renderBadges(uniqueDays.length);
     }
 
     function toDateOnlyString(dateObj){
@@ -356,6 +392,7 @@ body.dark-mode .secondary {
       saveLastProfileId(profile.id);
       refreshProfileAvatar();
       await loadTracking();
+      await loadBadges();
       const tracking = profileTracking[profile.id];
       const days = buildDateRange(el.period.value === 'weekly' ? 7 : 30);
       const entries = await fetchEntriesForRange(profile.id, days[0], days[days.length - 1]);

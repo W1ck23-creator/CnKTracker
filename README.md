@@ -56,3 +56,10 @@ Then commit and wait for Pages to republish.
 - Qty defaults to 1 and allows decimals
 - Macro values are multiplied by Qty when an entry is submitted
 - Qty resets to 1 after saving an entry
+
+
+## v6.0.0
+- Added earned day-logging badges to the Reports page beside the profile avatar
+- Uses badge images for 10, 25, 50, 100, and 365 logged days
+- Replaced the tracker streak panel with a small top-right lightning-bolt current streak indicator
+- Kept Reports summary current and longest streak tiles
