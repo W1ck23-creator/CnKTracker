@@ -294,7 +294,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="version">Version 5.1.0</div>
+      <div class="version">Version 5.2.0</div>
     </div>
 
     <section class="card" id="loginCard">
@@ -373,6 +373,7 @@ body.dark-mode .icon-btn.secondary {
                 </div>
               </div>
             </div>
+            <div class="field quarter"><label for="quantity">Qty</label><input id="quantity" type="number" min="0.1" step="0.1" value="1" placeholder="1" /></div>
             <div class="field quarter metric-input metric-calories"><label for="calories">Calories</label><input id="calories" type="number" min="0" step="1" placeholder="150" /></div>
             <div class="field quarter metric-input metric-protein"><label for="protein">Protein (g)</label><input id="protein" type="number" min="0" step="0.1" placeholder="15" /></div>
             <div class="field quarter metric-input metric-carbs"><label for="carbs">Carbs (g)</label><input id="carbs" type="number" min="0" step="0.1" placeholder="10" /></div>
@@ -463,6 +464,7 @@ body.dark-mode .icon-btn.secondary {
       darkModeToggle: document.getElementById('darkModeToggle'),
       meal: document.getElementById('meal'),
       foodName: document.getElementById('foodName'),
+      quantity: document.getElementById('quantity'),
       calories: document.getElementById('calories'),
       protein: document.getElementById('protein'),
       carbs: document.getElementById('carbs'),
@@ -506,6 +508,11 @@ body.dark-mode .icon-btn.secondary {
     function formatNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1}); }
     function metricSuffix(m){ return m==='calories' ? '' : 'g'; }
     function metricLabel(m){ return {calories:'Calories',protein:'Protein',carbs:'Carbs',fat:'Fat',sugar:'Sugar',fiber:'Fiber'}[m]||m; }
+    function getQuantityValue(){
+      const raw = Number(el.quantity?.value || 1);
+      if (!Number.isFinite(raw) || raw <= 0) return 1;
+      return raw;
+    }
     function setStatus(node,msg,kind=''){ node.textContent=msg; node.className='status'+(kind?' '+kind:''); }
     function escapeHtml(str){ return String(str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
     function selectedProfileId(){ return el.profile.value||''; }
@@ -594,6 +601,7 @@ body.dark-mode .icon-btn.secondary {
       el.fat.value = row.fat ?? '';
       el.sugar.value = row.sugar ?? '';
       el.fiber.value = row.fiber ?? '';
+      if (el.quantity) el.quantity.value = '1';
       el.addEntryBtn.textContent = 'Update Entry';
       window.scrollTo({ top: 0, behavior: 'smooth' });
       el.foodName.focus();
@@ -602,6 +610,7 @@ body.dark-mode .icon-btn.secondary {
     function resetEntryForm(){
       editingEntryId = null;
       ['foodName','calories','protein','carbs','fat','sugar','fiber'].forEach(k => el[k].value = '');
+      if (el.quantity) el.quantity.value = '1';
       if (el.favoriteFoodSearch) el.favoriteFoodSearch.value = '';
       closeFavoriteResults();
       el.addEntryBtn.textContent = 'Add Entry';
@@ -693,6 +702,7 @@ body.dark-mode .icon-btn.secondary {
       el.fat.value = favorite.fat ?? '';
       el.sugar.value = favorite.sugar ?? '';
       el.fiber.value = favorite.fiber ?? '';
+      if (el.quantity) el.quantity.value = '1';
     }
 
     async function saveCurrentAsFavorite(){
@@ -898,10 +908,11 @@ body.dark-mode .icon-btn.secondary {
       if (!profile) { alert('No profile selected.'); return; }
       const foodName = el.foodName.value.trim();
       if (!foodName) { alert('Please enter a food name.'); el.foodName.focus(); return; }
+      const qty = getQuantityValue();
       const payload = {
         user_id: currentUser.id, profile_id: profile.id, entry_date: el.date.value, meal: el.meal.value, food_name: foodName,
-        calories: Number(el.calories.value || 0), protein: Number(el.protein.value || 0), carbs: Number(el.carbs.value || 0),
-        fat: Number(el.fat.value || 0), sugar: Number(el.sugar.value || 0), fiber: Number(el.fiber.value || 0)
+        calories: Number(el.calories.value || 0) * qty, protein: Number(el.protein.value || 0) * qty, carbs: Number(el.carbs.value || 0) * qty,
+        fat: Number(el.fat.value || 0) * qty, sugar: Number(el.sugar.value || 0) * qty, fiber: Number(el.fiber.value || 0) * qty
       };
 
       let error = null;
