@@ -18,6 +18,8 @@
     .topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .top-streak-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border); border-radius:999px; padding:8px 12px; font-weight:700; font-size:.9rem; line-height:1; }
     .top-streak-bolt { font-size:1rem; }
+
+#currentStreakValue { color: inherit; background: transparent !important; }
     h1 { margin:0 0 6px; font-size:1.9rem; } h2 { margin:0 0 12px; } .sub { margin:0 0 18px; color:var(--muted); }
     .grid { display:grid; gap:16px; grid-template-columns:repeat(12,1fr); }
     .card { grid-column:span 12; background:var(--card); border:1px solid rgba(0,0,0,0.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; }
@@ -163,6 +165,15 @@ body.dark-mode .version {
   color:var(--text);
   border-color:var(--border);
 }
+body.dark-mode .top-streak-chip {
+  background:#1f2937;
+  color:var(--text);
+  border-color:var(--border);
+}
+body.dark-mode .top-streak-chip span {
+  background:transparent !important;
+  color:inherit;
+}
 body.dark-mode .nav a.active {
   background:var(--accent);
   color:#fff;
@@ -297,7 +308,7 @@ body.dark-mode .icon-btn.secondary {
   <div class="wrap">
     <div class="topbar">
       <div class="nav"><a class="active" href="./index.html">Tracker</a><a href="./reports.html">Reports</a></div>
-      <div class="topbar-right"><div class="top-streak-chip" title="Current streak"><span class="top-streak-bolt">⚡</span><span id="currentStreakValue">0</span></div><div class="version">Version 6.0.0</div></div>
+      <div class="topbar-right"><div class="top-streak-chip" title="Current streak"><span class="top-streak-bolt">⚡</span><span id="currentStreakValue">0</span></div><div class="version">Version 6.0.1</div></div>
     </div>
 
     <section class="card" id="loginCard">
