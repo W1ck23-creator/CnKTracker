@@ -49,3 +49,10 @@ Then commit and wait for Pages to republish.
 - Replaced plain Favorite Foods dropdown with a searchable autocomplete-style favorites field
 - Type to filter favorites by any part of the food name
 - Click or keyboard-select a favorite to autofill the entry form
+
+
+## v5.2.0
+- Added small Qty field to Tracker
+- Qty defaults to 1 and allows decimals
+- Macro values are multiplied by Qty when an entry is submitted
+- Qty resets to 1 after saving an entry
